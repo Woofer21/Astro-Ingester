@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AstroIngesterUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "AstroIngesterUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

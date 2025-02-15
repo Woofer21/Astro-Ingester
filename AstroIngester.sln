@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35806.99 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroIngesterUI", "AstroIngesterUI\AstroIngesterUI.csproj", "{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroIngesterCLI", "AstroIngesterCLI\AstroIngesterCLI.csproj", "{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|ARM64.Build.0 = Debug|ARM64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|x64.ActiveCfg = Debug|x64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|x64.Build.0 = Debug|x64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|x64.Deploy.0 = Debug|x64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|x86.ActiveCfg = Debug|x86
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|x86.Build.0 = Debug|x86
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Debug|x86.Deploy.0 = Debug|x86
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|ARM64.ActiveCfg = Release|ARM64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|ARM64.Build.0 = Release|ARM64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|ARM64.Deploy.0 = Release|ARM64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|x64.ActiveCfg = Release|x64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|x64.Build.0 = Release|x64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|x64.Deploy.0 = Release|x64
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|x86.ActiveCfg = Release|x86
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|x86.Build.0 = Release|x86
+		{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}.Release|x86.Deploy.0 = Release|x86
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Debug|x64.Build.0 = Debug|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Debug|x86.Build.0 = Debug|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|ARM64.Build.0 = Release|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x64.ActiveCfg = Release|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x64.Build.0 = Release|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A73ED44F-D77E-42F2-8D8E-2E5829FF4BA7}
+	EndGlobalSection
+EndGlobal
