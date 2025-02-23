@@ -36,8 +36,8 @@ namespace AstroIngesterCLI
             {
                 IEnumerable<Directory> directories = ImageMetadataReader.ReadMetadata(path);
 
-                Directory exifData = directories.FirstOrDefault();
-                exifData.TryGetDateTime(ExifDirectoryBase.TagDateTime, out DateTime date);
+                ExifIfd0Directory directory = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
+                directory.TryGetDateTime(ExifDirectoryBase.TagDateTime, out DateTime date);
 
                 return date;
             } catch (Exception e)
