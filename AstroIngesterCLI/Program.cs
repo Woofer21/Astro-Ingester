@@ -1,13 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Drawing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
 
 namespace AstroIngesterCLI
 {
@@ -19,39 +10,19 @@ namespace AstroIngesterCLI
 
 			foreach (string file in files)
 			{
-				Console.WriteLine($"Found File: {file}");
-
-                string comment = getComment(file);
-                if (string.IsNullOrEmpty(comment))
-                {
-                    Console.WriteLine("Unable to get comment on image. Either No comment present or it errored");
-                } else Console.WriteLine(comment);
-            }
+				try
+				{
+					DateTime picDate = MetadataHelpers.GetDate(file);
+					Console.WriteLine($"{file} - {picDate}");
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine("Unhandled Main: " + e.Message);
+				}
+			}
 
 			Console.WriteLine("Ended");
             Console.ReadLine();
-		}
-
-		static string getComment(string filePath)
-		{
-			try
-			{ 
-                IEnumerable<MetadataExtractor.Directory> directories = ImageMetadataReader.ReadMetadata(filePath);
-
-                foreach (MetadataExtractor.Directory directory in directories)
-                {
-                    foreach (Tag tag in directory.Tags)
-                        if (tag.Type == ExifDirectoryBase.TagUserComment)
-                            return tag.Description;
-                }
-
-                return null;
-            } catch (Exception e)
-			{
-                Console.WriteLine("Unable to get comment: " + e);
-				return null;
-			}
-
         }
     }
 }
