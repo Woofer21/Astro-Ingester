@@ -1,20 +1,19 @@
 ﻿using MetadataExtractor.Formats.Exif;
 using MetadataExtractor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Directory = MetadataExtractor.Directory;
 
-namespace AstroIngesterCLI
+namespace AstroIngesterCore
 {
-    static class MetadataHelpers
+    public static class MetadataTools
     {
+
         public static string GetComment(string path)
-        { 
+        {
             try
             {
                 IEnumerable<Directory> directories = ImageMetadataReader.ReadMetadata(path);
 
-                foreach (Directory directory in directories)
+                foreach (Directory directory in directories.OfType<ExifSubIfdDirectory>())
                 {
                     foreach (Tag tag in directory.Tags)
                         if (tag.Type == ExifDirectoryBase.TagUserComment)
@@ -25,8 +24,8 @@ namespace AstroIngesterCLI
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unable to get comment: " + e);
-                return null;
+                Console.WriteLine($"Unhandled Exception: {e.Message}");
+                throw;
             }
         }
 
@@ -40,7 +39,8 @@ namespace AstroIngesterCLI
                 directory.TryGetDateTime(ExifDirectoryBase.TagDateTime, out DateTime date);
 
                 return date;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine($"Unhandled Exception: {e.Message}");
                 throw;

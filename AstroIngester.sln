@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99 d17.13
+VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroIngesterUI", "AstroIngesterUI\AstroIngesterUI.csproj", "{9AC8D9FD-EFB1-4E15-B9E3-88E621CBA5EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroIngesterCLI", "AstroIngesterCLI\AstroIngesterCLI.csproj", "{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroIngesterCore", "AstroIngesterCore\AstroIngesterCore.csproj", "{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,18 @@ Global
 		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x64.Build.0 = Release|Any CPU
 		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x86.ActiveCfg = Release|Any CPU
 		{EC4C2F93-0BCE-46E4-B9E7-1312798DC35D}.Release|x86.Build.0 = Release|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Debug|x64.Build.0 = Debug|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Debug|x86.Build.0 = Debug|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Release|ARM64.Build.0 = Release|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Release|x64.ActiveCfg = Release|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Release|x64.Build.0 = Release|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Release|x86.ActiveCfg = Release|Any CPU
+		{AE3051B0-F880-4E34-A4D3-0FF81CE53DC8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

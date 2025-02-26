@@ -1,4 +1,5 @@
 ﻿using System;
+using AstroIngesterCore;
 
 namespace AstroIngesterCLI
 {
@@ -11,10 +12,13 @@ namespace AstroIngesterCLI
 			foreach (string file in files)
 			{
 				try
-				{
-					DateTime picDate = MetadataHelpers.GetDate(file);
-					Console.WriteLine($"{file} - {picDate}");
-				}
+                {
+                    DateTime picDate = MetadataTools.GetDate(file);
+                    Console.WriteLine($"{file} - {picDate}");
+
+                    string picComment = MetadataTools.GetComment(file);
+                    Console.WriteLine($"{file} - {picComment}");
+                }
 				catch (Exception e)
 				{
 					Console.WriteLine("Unhandled Main: " + e.Message);
