@@ -17,7 +17,8 @@ namespace AstroIngesterCLI
                     Console.WriteLine($"{file} - {picDate}");
 
                     string picComment = MetadataTools.GetComment(file);
-                    Console.WriteLine($"{file} - {picComment}");
+					if (string.IsNullOrEmpty(picComment)) Console.WriteLine($"{file} - No Comment Added");
+					else Console.WriteLine($"{file} - {picComment}");
                 }
 				catch (Exception e)
 				{
