@@ -10,38 +10,17 @@ namespace AstroIngesterCLI
 		static void Main(string[] args)
 		{
 
-			FileTools fileT = new();
-			DriveInfo[] drives = fileT.GetDrives();
-			DriveInfo selectedDrive = null;
+			FileTools fileTools = new();
+			fileTools.AutoDetectDrive();
 
-			bool gettingDrive = true;
-
-			while (gettingDrive)
+			string dirPath = fileTools.InputPath;
+			if (dirPath == null)
 			{
-                Console.WriteLine("Type a number to select an 'Input Drive' from the list below");
-                
-				for (int i = 0; i < drives.Length; i++)
-                {
-                    Console.WriteLine($"{i + 1}) {drives[i].Name}");
-                }
-                Console.WriteLine("-1) Close");
-
-                Console.Write("Drive Number: ");
-				string drive = Console.ReadLine();
-                bool isValidDrive = int.TryParse(drive, out int driveNum);
-
-				if (driveNum == -1) Process.GetCurrentProcess().Kill();
-
-				if (isValidDrive)
-				{
-                    bool isDriveSelected = fileT.SelectDrive(driveNum, out selectedDrive);
-                    if (isDriveSelected) gettingDrive = false;
-                }
-            }
-
-            Console.WriteLine($"Selected Drive {selectedDrive.Name}");
-
-
+                Console.WriteLine("Switching to manual selection...");
+				fileTools.ManuallySelectDrive();
+				dirPath = fileTools.InputPath;
+			}
+            Console.WriteLine($"Selected Base Directory: {dirPath}");
 
 
 			//string[] files = System.IO.Directory.GetFiles("E:/Testing");
