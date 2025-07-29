@@ -25,7 +25,7 @@ namespace AstroIngesterCore
         {
             while (true)
             {
-                Console.Write("Enter the path you would like to input files from (-1 to kill program): ");
+                Console.Write("Enter the path to the \"root folder\" you would like to input files from. \nThe program will search for picture files through each folder in the selected \"root folder\". \nEnter \"-1\" to exit\n> ");
                 string pathName = Console.ReadLine();
 
                 if (pathName != null)
@@ -70,10 +70,14 @@ namespace AstroIngesterCore
 
                         while (selecting)
                         {
-                            Console.Write("Select this drive? (Y/N): ");
+                            Console.Write("Select this drive? (Y/n): ");
                             string choice = Console.ReadLine();
 
-                            if (choice != null && (choice.Equals("y", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("yes", StringComparison.CurrentCultureIgnoreCase)))
+                            if (choice == "") {
+                                inputPath = dirName;
+                                return true;
+                            }
+                            else if (choice != null && (choice.Equals("y", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("yes", StringComparison.CurrentCultureIgnoreCase)))
                             {
                                 inputPath = dirName;
                                 return true;

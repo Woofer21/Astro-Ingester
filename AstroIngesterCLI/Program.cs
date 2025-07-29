@@ -17,13 +17,16 @@ namespace AstroIngesterCLI
 			if (dirPath == null)
 			{
                 Console.WriteLine("Switching to manual selection...");
-				fileTools.ManuallySelectDrive();
+                fileTools.ManuallySelectDrive();
 				dirPath = fileTools.InputPath;
 			}
             Console.WriteLine($"Selected Base Directory: {dirPath}");
 
-
-			//string[] files = System.IO.Directory.GetFiles("E:/Testing");
+            string[] directories = Directory.GetDirectories(dirPath, "*", SearchOption.AllDirectories);
+            foreach (string directory in directories)
+			{
+                Console.WriteLine($"Indexing files in {directory}...");
+			}
 
 			//foreach (string file in files)
 			//{
