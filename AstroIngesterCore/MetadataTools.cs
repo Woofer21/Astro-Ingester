@@ -24,7 +24,7 @@ namespace AstroIngesterCore
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Unhandled Exception: {e.Message}");
+                ConsoleHelpers.Error($"Unhandled Exception: {e.Message}");
                 throw;
             }
         }
@@ -42,7 +42,7 @@ namespace AstroIngesterCore
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Unhandled Exception: {e.Message}");
+                ConsoleHelpers.Error($"Unhandled Exception: {e.Message}");
                 throw;
             }
         }
@@ -54,7 +54,7 @@ namespace AstroIngesterCore
             foreach (Directory directory in directories)
             {
                 foreach (Tag tag in directory.Tags)
-                    Console.WriteLine($"{directory.Name} - {tag.Name} = {tag.Description}");
+                    ConsoleHelpers.Muted($"{directory.Name} - {tag.Name} = {tag.Description}");
             }
         }
     }

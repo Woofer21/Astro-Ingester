@@ -16,16 +16,16 @@ namespace AstroIngesterCLI
 			string dirPath = fileTools.InputPath;
 			if (dirPath == null)
 			{
-                Console.WriteLine("Switching to manual selection...");
+                ConsoleHelpers.Muted("Switching to manual selection...");
                 fileTools.ManuallySelectDrive();
 				dirPath = fileTools.InputPath;
 			}
-            Console.WriteLine($"Selected Base Directory: {dirPath}");
+            ConsoleHelpers.Muted($"Selected Base Directory: {dirPath}");
 
             string[] directories = Directory.GetDirectories(dirPath, "*", SearchOption.AllDirectories);
             foreach (string directory in directories)
 			{
-                Console.WriteLine($"Indexing files in {directory}...");
+                ConsoleHelpers.Muted($"Indexing files in {directory}...");
 			}
 
 			//foreach (string file in files)
@@ -45,7 +45,7 @@ namespace AstroIngesterCLI
 			//	}
 			//}
 
-			Console.WriteLine("Ended");
+			ConsoleHelpers.Log("Ended");
             Console.ReadLine();
         }
     }

@@ -25,7 +25,7 @@ namespace AstroIngesterCore
         {
             while (true)
             {
-                Console.Write("Enter the path to the \"root folder\" you would like to input files from. \nThe program will search for picture files through each folder in the selected \"root folder\". \nEnter \"-1\" to exit\n> ");
+                ConsoleHelpers.Log("Enter the path to the \"root folder\" you would like to input files from. \nThe program will search for picture files through each folder in the selected \"root folder\". \nEnter \"-1\" to exit\n> ", false);
                 string pathName = Console.ReadLine();
 
                 if (pathName != null)
@@ -48,7 +48,7 @@ namespace AstroIngesterCore
                 inputPath = pathName;
             } else
             {
-                Console.WriteLine("Invalid path, switching to manual input...");
+                ConsoleHelpers.Error("Invalid path, switching to manual input...");
                 ManuallySelectDrive();
             }
             return true;
@@ -66,11 +66,11 @@ namespace AstroIngesterCore
                     if (dirName == $@"{drive.Name}DCIM")
                     {
                         bool selecting = true;
-                        Console.WriteLine($"Found Drive {dirName}");
+                        ConsoleHelpers.Info($"Found Drive {dirName}");
 
                         while (selecting)
                         {
-                            Console.Write("Select this drive? (Y/n): ");
+                            ConsoleHelpers.Log("Select this drive? (Y/n): ", false);
                             string choice = Console.ReadLine();
 
                             if (choice == "") {
@@ -91,7 +91,7 @@ namespace AstroIngesterCore
                 }
             }
 
-            Console.WriteLine("No Drives Detected");
+            ConsoleHelpers.Muted("No Drives Detected");
             return false;
         }
 
