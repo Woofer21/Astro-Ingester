@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,12 @@ namespace AstroIngesterCore
     public class FileTools
     {
         private DriveInfo[] drives = DriveInfo.GetDrives();
-        private DriveInfo selectedDrive;
+        private DriveInfo? selectedDrive;
+        public List<OutputPathItem> OutputPaths { get; } = [];
+        public bool SeperateByType { get; set; } = true;
+        public bool SeperateByComment { get; set; } = true;
+        public bool IgnoreUncategorized { get; set; } = true;
+
         private string inputPath;
         public string InputPath
         {
@@ -95,5 +101,201 @@ namespace AstroIngesterCore
             return false;
         }
 
+        public void AddOutputPath()
+        {
+            bool choseOutputForAll = false;
+            bool chooseLoop = true;
+            while (chooseLoop)
+            {
+                int menuLineCount = 8;
+                ConsoleHelpers.Log("Choose an option from the list: ", true);
+                ConsoleHelpers.Log("1) Add an output path for a specifed file extention", true, SeperateByType ? ConsoleColor.White : ConsoleColor.DarkGray);
+                ConsoleHelpers.Log("2) Add an output path for a specified comment content", true, SeperateByComment ? ConsoleColor.White : ConsoleColor.DarkGray);
+                ConsoleHelpers.Log("3) Add an output path for all others", false, IgnoreUncategorized ? ConsoleColor.DarkGray : ConsoleColor.White);
+                if (!IgnoreUncategorized) ConsoleHelpers.Error(" (required)");
+                else ConsoleHelpers.Log("");
+                ConsoleHelpers.Log("4) View current output paths", true, OutputPaths.Count > 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
+                ConsoleHelpers.Log("5) Continue Program", true, !IgnoreUncategorized ? choseOutputForAll ? ConsoleColor.White : ConsoleColor.DarkGray : ConsoleColor.White);
+                ConsoleHelpers.Log("-1) Quit program\n> ", false);
+                string? choice = Console.ReadLine();
+
+                if (choice != null)
+                {
+                    if (choice == "-1")
+                        Environment.Exit(0);
+                    else if (choice == "1" && SeperateByType)
+                    {
+                        ConsoleHelpers.ClearLines(menuLineCount);
+                        ConsoleHelpers.Success("1) Add an output path for a specifed file extention");
+
+                        OutputPathItem? pathItem = null;
+                        bool loop = true;
+                        while (loop)
+                        {
+                            ConsoleHelpers.Log("Enter the output path, the files will be copied to <Your Entered Path>/<year>/<month>/<day>\n> ", false);
+                            string? path = Console.ReadLine();
+
+                            if (path != null && Directory.Exists(path))
+                            {
+                                pathItem = new OutputPathItem(path);
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Muted("Selected output path: ", false);
+                                ConsoleHelpers.Success($"{path}/year/month/day");
+                                loop = false;
+                            } 
+                            else
+                            {
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Error($"Invalid path: {path}, please try again");
+                            }
+                        }
+
+                        ConsoleHelpers.Log("Enter the file extentions you would like to copy to this path, seperated by commas (e.g. .jpg, .png, .tif): ", false);
+                        string? extentionsInput = Console.ReadLine();
+                        if (extentionsInput != null)
+                        {
+                            List<string> extentions = [.. extentionsInput.Split(',').Select(ext => ext.Trim())];
+                            pathItem!.Extentions = extentions;
+                            ConsoleHelpers.ClearLines(1);
+                            ConsoleHelpers.Muted("Selected extentions: ", false);
+                            ConsoleHelpers.Success(extentionsInput);
+                        } 
+                        else
+                        {
+                            ConsoleHelpers.Error("Unkown Error");
+                        }
+
+                        OutputPaths.Add(pathItem!);
+                    }
+                    else if (choice == "2" && SeperateByComment)
+                    {
+                        ConsoleHelpers.ClearLines(menuLineCount);
+                        ConsoleHelpers.Success("2) Add an output path for a specified comment content");
+
+                        OutputPathItem? pathItem = null;
+                        bool loop = true;
+                        while (loop)
+                        {
+                            ConsoleHelpers.Log("Enter the output path, the files with matching comment will be copied to <Your Entered Path>/\n> ", false);
+                            string? path = Console.ReadLine();
+
+                            if (path != null && Directory.Exists(path))
+                            {
+                                pathItem = new OutputPathItem(path);
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Muted("Selected output path: ", false);
+                                ConsoleHelpers.Success($"{path}/");
+                                loop = false;
+                            }
+                            else
+                            {
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Error($"Invalid path: {path}, please try again");
+                            }
+                        }
+
+                        ConsoleHelpers.Log("Enter the EXACT comment content to match, you can add multiple by seprating them by a comma: ", false);
+                        string? commentsInput = Console.ReadLine();
+                        if (commentsInput != null)
+                        {
+                            List<string> comments = [.. commentsInput.Split(',').Select(ext => ext.Trim())];
+                            pathItem!.Comments = comments;
+                            ConsoleHelpers.ClearLines(1);
+                            ConsoleHelpers.Muted("Comment to check against: ", false);
+                            ConsoleHelpers.Success(commentsInput);
+                        }
+                        else
+                        {
+                            ConsoleHelpers.Error("Unkown Error");
+                        }
+
+                        OutputPaths.Add(pathItem!);
+                    }
+                    else if (choice == "3" && !IgnoreUncategorized)
+                    {
+                        ConsoleHelpers.ClearLines(menuLineCount);
+                        ConsoleHelpers.Success("3) Add an output path for all others");
+
+                        bool loop = true;
+                        while (loop)
+                        {
+                            ConsoleHelpers.Log("Enter the output path for all other files to go to, they will go to <Your Entered Path>/year/month/day\n> ", false);
+                            string? path = Console.ReadLine();
+
+                            if (path != null && Directory.Exists(path))
+                            {
+                                OutputPaths.Add(new OutputPathItem(path));
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Muted("Selected output path: ", false);
+                                ConsoleHelpers.Success($"{path}/year/month/day");
+                                loop = false;
+                            }
+                            else
+                            {
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Error($"Invalid path: {path}, please try again");
+                            }
+                        }
+                        choseOutputForAll = true;
+                    }
+                    else if (choice == "4" && OutputPaths.Count > 0)
+                    {
+                        int lineCount = 0;
+
+                        ConsoleHelpers.ClearLines(menuLineCount);
+                        ConsoleHelpers.Success("4) View current output paths");
+
+                        for (int i = 0; i < 2; i++)
+                        {
+                            for (int j = 0; j < OutputPaths.Count; j++)
+                            {
+                                lineCount++;
+                                OutputPathItem pathItem = OutputPaths[j];
+                                ConsoleHelpers.Log($"Output Path {j + 1}: {pathItem.Path}", true, i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
+                                if (pathItem.Extentions.Count > 0)
+                                {
+                                    lineCount++;
+                                    ConsoleHelpers.Log("  Extentions: " + string.Join(", ", pathItem.Extentions), true, i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
+                                }
+                                if (pathItem.Comments.Count > 0)
+                                {
+                                    lineCount++;
+                                    ConsoleHelpers.Log("  Comments: " + string.Join(", ", pathItem.Comments), true, i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
+                                }
+                            }
+
+                            if (i == 0)
+                            {
+                                ConsoleHelpers.Log("Press enter to return to menu...", false);
+                                Console.ReadKey();
+                                ConsoleHelpers.ClearLines(lineCount + 1);
+                            }
+                        }
+
+                    }
+                    else if ((choice == "5" && (!IgnoreUncategorized && choseOutputForAll)) || (choice == "5" && IgnoreUncategorized))
+                    {
+                        ConsoleHelpers.ClearLines(menuLineCount);
+                        chooseLoop = false;
+                    }
+                    else
+                        ConsoleHelpers.ClearLines(menuLineCount);
+                }
+            }
+        }
+
+        public bool AddOutputPath(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                OutputPaths.Add(new OutputPathItem(path));
+                return true;
+            }
+            else
+            {
+                ConsoleHelpers.Error("Invalid output path");
+                return false;
+            }
+        }
     }
 }

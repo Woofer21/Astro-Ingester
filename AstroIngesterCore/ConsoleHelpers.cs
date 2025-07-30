@@ -1,4 +1,6 @@
-﻿namespace AstroIngesterCore
+﻿using System.Diagnostics;
+
+namespace AstroIngesterCore
 {
     public class ConsoleHelpers
     {
@@ -41,6 +43,23 @@
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Write(message, newLine);
             Console.ResetColor();
+        }
+
+        public static void Success(string message, bool newLine = true)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Write(message, newLine);
+            Console.ResetColor();
+        }
+
+        public static void ClearLines(int number)
+        {
+            for (int i = 0; i < number; i++)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.Write(new String(' ', Console.BufferWidth));
+            }
+            Console.SetCursorPosition(0, Console.CursorTop);
         }
     }
 }
