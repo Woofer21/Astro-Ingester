@@ -39,7 +39,6 @@ namespace AstroIngesterCLI
                 fileTools.ManuallySelectDrive();
 				dirPath = fileTools.InputPath;
 			}
-            ConsoleHelpers.Muted($"Selected Base Directory: {dirPath}");
 
 			//Determine output modes, this decides if we need multiple output paths or just one
 			string splitQuestion = "Would you like to split up files by their type? (Y/n): ";

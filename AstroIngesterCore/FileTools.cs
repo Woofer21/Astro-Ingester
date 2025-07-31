@@ -33,7 +33,7 @@ namespace AstroIngesterCore
             while (true)
             {
                 ConsoleHelpers.Log("Enter the path to the \"root folder\" you would like to input files from. \nThe program will search for picture files through each folder in the selected \"root folder\". \nEnter \"-1\" to exit\n> ", false);
-                string pathName = Console.ReadLine();
+                string? pathName = Console.ReadLine();
 
                 if (pathName != null)
                 {
@@ -42,8 +42,15 @@ namespace AstroIngesterCore
 
                     if (Directory.Exists(pathName)) {
                         inputPath = pathName;
+                        ConsoleHelpers.ClearLines(4);
+                        ConsoleHelpers.Muted("Selected input path: ", false);
+                        ConsoleHelpers.Success(inputPath);
                         return true;
-                    } 
+                    } else
+                    {
+                        ConsoleHelpers.ClearLines(4);
+                        ConsoleHelpers.Error($"Invalid path: {pathName}, please try again");
+                    }
                 }
             }
         }
@@ -77,21 +84,23 @@ namespace AstroIngesterCore
 
                         while (selecting)
                         {
-                            ConsoleHelpers.Log("Select this drive? (Y/n): ", false);
-                            string choice = Console.ReadLine();
+                            ConsoleHelpers.Log($"Select this drive? (Y/n): ", false);
+                            string? choice = Console.ReadLine();
 
-                            if (choice == "") {
-                                inputPath = dirName;
-                                return true;
-                            }
-                            else if (choice != null && (choice.Equals("y", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("yes", StringComparison.CurrentCultureIgnoreCase)))
-                            {
-                                inputPath = dirName;
-                                return true;
-                            }
-                            else if (choice != null && (choice.Equals("n", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("no", StringComparison.CurrentCultureIgnoreCase)))
+                            if (choice != null && (choice.Equals("n", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("no", StringComparison.CurrentCultureIgnoreCase)))
                             {
                                 selecting = false;
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Muted($"Select {dirName}? (Y/n): ", false);
+                                ConsoleHelpers.Error("No");
+                                return false;
+                            } else
+                            {
+                                inputPath = dirName;
+                                ConsoleHelpers.ClearLines(2);
+                                ConsoleHelpers.Muted($"Select {dirName}? (Y/n): ", false);
+                                ConsoleHelpers.Success("Yes");
+                                return true;
                             }
                         }
                     }
@@ -384,6 +393,8 @@ namespace AstroIngesterCore
             }
 
             if (Verbose) ConsoleHelpers.Muted($"Starting Move Processing...");
+
+
         }
     }
 }
