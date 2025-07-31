@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace AstroIngesterCore
     {
         private DriveInfo[] drives = DriveInfo.GetDrives();
         private DriveInfo? selectedDrive;
-        public List<OutputPathItem> OutputPaths { get; } = [];
+        public Dictionary<string, List<OutputPathItem>> OutputPaths { get; } = [];
         public bool SeperateByType { get; set; } = true;
         public bool SeperateByComment { get; set; } = true;
         public bool IgnoreUncategorized { get; set; } = true;
@@ -175,7 +176,11 @@ namespace AstroIngesterCore
                             ConsoleHelpers.Error("Unkown Error");
                         }
 
-                        OutputPaths.Add(pathItem!);
+                        OutputPaths.TryGetValue("extention", out List<OutputPathItem>? outputPaths);
+                        if (outputPaths == null)
+                            OutputPaths.Add("extention", [pathItem!]);
+                        else
+                            OutputPaths["extention"].Add(pathItem!);
                     }
                     else if (choice == "2" && SeperateByComment)
                     {
@@ -219,7 +224,11 @@ namespace AstroIngesterCore
                             ConsoleHelpers.Error("Unkown Error");
                         }
 
-                        OutputPaths.Add(pathItem!);
+                        OutputPaths.TryGetValue("comment", out List<OutputPathItem>? outputPaths);
+                        if (outputPaths == null)
+                            OutputPaths.Add("comment", [pathItem!]);
+                        else
+                            OutputPaths["comment"].Add(pathItem!);
                     }
                     else if (choice == "3" && !IgnoreUncategorized)
                     {
@@ -234,7 +243,12 @@ namespace AstroIngesterCore
 
                             if (path != null && Directory.Exists(path))
                             {
-                                OutputPaths.Add(new OutputPathItem(path));
+                                OutputPaths.TryGetValue("other", out List<OutputPathItem>? outputPaths);
+                                if (outputPaths == null)
+                                    OutputPaths.Add("other", []);
+                                else
+                                    OutputPaths["other"].Add(new OutputPathItem(path));
+
                                 ConsoleHelpers.ClearLines(2);
                                 ConsoleHelpers.Muted("Selected output path: ", false);
                                 ConsoleHelpers.Success($"{path}/year/month/day");
@@ -257,20 +271,28 @@ namespace AstroIngesterCore
 
                         for (int i = 0; i < 2; i++)
                         {
-                            for (int j = 0; j < OutputPaths.Count; j++)
+                            ConsoleColor color = i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray;
+                            foreach (string outputPathKey in OutputPaths.Keys)
                             {
+                                List<OutputPathItem> outputPathItems = OutputPaths[outputPathKey];
+
                                 lineCount++;
-                                OutputPathItem pathItem = OutputPaths[j];
-                                ConsoleHelpers.Log($"Output Path {j + 1}: {pathItem.Path}", true, i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
-                                if (pathItem.Extentions.Count > 0)
+                                ConsoleHelpers.Log(outputPathKey, true, color);
+                                for (int j = 0; j < outputPathItems.Count; j++)
                                 {
                                     lineCount++;
-                                    ConsoleHelpers.Log("  Extentions: " + string.Join(", ", pathItem.Extentions), true, i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
-                                }
-                                if (pathItem.Comments.Count > 0)
-                                {
-                                    lineCount++;
-                                    ConsoleHelpers.Log("  Comments: " + string.Join(", ", pathItem.Comments), true, i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
+                                    OutputPathItem pathItem = outputPathItems[j];
+                                    ConsoleHelpers.Log($"|-> Output Path {j + 1}: {pathItem.Path}", true, color);
+                                    if (pathItem.Extentions.Count > 0)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> Extentions: " + string.Join(", ", pathItem.Extentions), true, color);
+                                    }
+                                    if (pathItem.Comments.Count > 0)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> Comments: " + string.Join(", ", pathItem.Comments), true, color);
+                                    }
                                 }
                             }
 
@@ -294,19 +316,19 @@ namespace AstroIngesterCore
             }
         }
 
-        public bool AddOutputPath(string path)
-        {
-            if (Directory.Exists(path))
-            {
-                OutputPaths.Add(new OutputPathItem(path));
-                return true;
-            }
-            else
-            {
-                ConsoleHelpers.Error("Invalid output path");
-                return false;
-            }
-        }
+        //public bool AddOutputPath(string path)
+        //{
+        //    if (Directory.Exists(path))
+        //    {
+        //        OutputPaths.Add(new OutputPathItem(path));
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        ConsoleHelpers.Error("Invalid output path");
+        //        return false;
+        //    }
+        //}
 
         public void StartMoving()
         {

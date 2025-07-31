@@ -30,7 +30,7 @@ namespace AstroIngesterCLI
 
             fileTools.AutoDetectDrive();
 			string dirPath = fileTools.InputPath;
-			List<OutputPathItem> outputPaths = fileTools.OutputPaths;
+			Dictionary<string, List<OutputPathItem>> outputPaths = fileTools.OutputPaths;
 
 			//Select the input path
 			if (dirPath == null)
