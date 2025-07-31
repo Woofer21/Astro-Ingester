@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AstroIngesterCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "--verbose"
+    }
+  }
+}

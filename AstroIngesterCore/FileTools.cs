@@ -15,6 +15,7 @@ namespace AstroIngesterCore
         public bool SeperateByType { get; set; } = true;
         public bool SeperateByComment { get; set; } = true;
         public bool IgnoreUncategorized { get; set; } = true;
+        public bool Verbose { get; set; } = false;
 
         private string inputPath;
         public string InputPath
@@ -296,6 +297,93 @@ namespace AstroIngesterCore
                 ConsoleHelpers.Error("Invalid output path");
                 return false;
             }
+        }
+
+        public void StartMoving()
+        {
+            Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<string, List<FileInfo>>>>> categorizedFiles = [];
+            Dictionary<string, List<FileInfo>> categorizedByComment = [];
+
+            string[] directories = Directory.GetDirectories(InputPath, "*", SearchOption.AllDirectories);
+            foreach (string directory in directories)
+            {
+                if (Verbose) ConsoleHelpers.Muted($"Processing directory: {directory}");
+                string[] filePaths = Directory.GetFiles(directory);
+                foreach (string filePath in filePaths)
+                {
+                    if (Verbose) ConsoleHelpers.Muted($"|--> Processing file: {filePath}");
+
+                    FileInfo fileInfo = new FileInfo(filePath);
+                    DateTime fileTakenDate = MetadataTools.GetDate(filePath);
+                    int year = fileTakenDate.Year;
+                    int month = fileTakenDate.Month;
+                    int day = fileTakenDate.Day;
+                    string type = fileInfo.Extension.ToLower();
+                    string? comment = MetadataTools.GetComment(filePath);
+
+                    categorizedFiles.TryGetValue(year, out Dictionary<int, Dictionary<int, Dictionary<string, List<FileInfo>>>>? yearDict);
+                    if (yearDict != null)
+                    {
+                        yearDict.TryGetValue(month, out Dictionary<int, Dictionary<string, List<FileInfo>>>? monthDict);
+                        if (monthDict != null)
+                        {
+                            monthDict.TryGetValue(day, out Dictionary<string, List<FileInfo>>? dayDict);
+                            if (dayDict != null)
+                            {
+                                dayDict.TryGetValue(type, out List<FileInfo>? files);
+                                if (files != null)
+                                    categorizedFiles[year][month][day][type].Add(fileInfo);
+                                else
+                                    categorizedFiles[year][month][day].Add(type, [fileInfo]);
+                            }
+                            else
+                            {
+                                List<FileInfo> fl = [fileInfo];
+                                Dictionary<string, List<FileInfo>> newTypeDict = [];
+                                newTypeDict.Add(type, fl);
+                                categorizedFiles[year][month].Add(day, newTypeDict);
+                            }
+                        }
+                        else
+                        {
+                            List<FileInfo> fl = [fileInfo];
+                            Dictionary<string, List<FileInfo>> newTypeDict = [];
+                            newTypeDict.Add(type, fl);
+                            Dictionary<int, Dictionary<string, List<FileInfo>>> newDayDict = [];
+                            newDayDict.Add(day, newTypeDict);
+                            categorizedFiles[year].Add(month, newDayDict);
+                        }
+                    } 
+                    else
+                    {
+                        List<FileInfo> fl = [fileInfo];
+                        Dictionary<string, List<FileInfo>> newTypeDict = [];
+                        newTypeDict.Add(type, fl);
+                        Dictionary<int, Dictionary<string, List<FileInfo>>> newDayDict = [];
+                        newDayDict.Add(day, newTypeDict);
+                        Dictionary<int, Dictionary<int, Dictionary<string, List<FileInfo>>>> newMonthDict = [];
+                        newMonthDict.Add(month, newDayDict);
+                        categorizedFiles.Add(year, newMonthDict);
+
+                    }
+
+                    if (SeperateByComment)
+                    {
+                        if (comment != null)
+                        {
+                            if (!categorizedByComment.ContainsKey(comment))
+                            {
+                                categorizedByComment[comment] = [];
+                            }
+                            categorizedByComment[comment].Add(fileInfo);
+                        }
+                    }
+
+                    if (Verbose) ConsoleHelpers.Muted($" |--> Categorized: {year}, {month}, {day}, {type}{(SeperateByComment ? $", {comment}" : "")}");
+                }
+            }
+
+            if (Verbose) ConsoleHelpers.Muted($"Starting Move Processing...");
         }
     }
 }
