@@ -332,13 +332,15 @@ namespace AstroIngesterCore
 
         public void StartMoving()
         {
-            Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<string, List<FileInfo>>>>> categorizedFiles = [];
+            //        extention     ->  year        ->    month     ->    day -> List<FileInfo>
+            Dictionary<string, Dictionary<int, Dictionary<int, Dictionary<int, List<FileInfo>>>>> categorizedFiles = [];
             Dictionary<string, List<FileInfo>> categorizedByComment = [];
 
             string[] directories = Directory.GetDirectories(InputPath, "*", SearchOption.AllDirectories);
             foreach (string directory in directories)
             {
                 if (Verbose) ConsoleHelpers.Muted($"Processing directory: {directory}");
+
                 string[] filePaths = Directory.GetFiles(directory);
                 foreach (string filePath in filePaths)
                 {
@@ -352,50 +354,40 @@ namespace AstroIngesterCore
                     string type = fileInfo.Extension.ToLower();
                     string? comment = MetadataTools.GetComment(filePath);
 
-                    categorizedFiles.TryGetValue(year, out Dictionary<int, Dictionary<int, Dictionary<string, List<FileInfo>>>>? yearDict);
-                    if (yearDict != null)
+                    if (categorizedFiles.ContainsKey(type))
                     {
-                        yearDict.TryGetValue(month, out Dictionary<int, Dictionary<string, List<FileInfo>>>? monthDict);
-                        if (monthDict != null)
+                        if (categorizedFiles[type].ContainsKey(year))
                         {
-                            monthDict.TryGetValue(day, out Dictionary<string, List<FileInfo>>? dayDict);
-                            if (dayDict != null)
+                            if (categorizedFiles[type][year].ContainsKey(month))
                             {
-                                dayDict.TryGetValue(type, out List<FileInfo>? files);
-                                if (files != null)
-                                    categorizedFiles[year][month][day][type].Add(fileInfo);
+                                if (categorizedFiles[type][year][month].ContainsKey(day))
+                                {
+                                    categorizedFiles[type][year][month][day].Add(fileInfo);
+                                }
                                 else
-                                    categorizedFiles[year][month][day].Add(type, [fileInfo]);
+                                {
+                                    categorizedFiles[type][year][month].Add(day, [fileInfo]);
+                                }
                             }
                             else
                             {
-                                List<FileInfo> fl = [fileInfo];
-                                Dictionary<string, List<FileInfo>> newTypeDict = [];
-                                newTypeDict.Add(type, fl);
-                                categorizedFiles[year][month].Add(day, newTypeDict);
+                                categorizedFiles[type][year].Add(month, []);
+                                categorizedFiles[type][year][month].Add(day, [fileInfo]);
                             }
                         }
                         else
                         {
-                            List<FileInfo> fl = [fileInfo];
-                            Dictionary<string, List<FileInfo>> newTypeDict = [];
-                            newTypeDict.Add(type, fl);
-                            Dictionary<int, Dictionary<string, List<FileInfo>>> newDayDict = [];
-                            newDayDict.Add(day, newTypeDict);
-                            categorizedFiles[year].Add(month, newDayDict);
+                            categorizedFiles[type].Add(year, []);
+                            categorizedFiles[type][year].Add(month, []);
+                            categorizedFiles[type][year][month].Add(day, [fileInfo]);
                         }
-                    } 
+                    }
                     else
                     {
-                        List<FileInfo> fl = [fileInfo];
-                        Dictionary<string, List<FileInfo>> newTypeDict = [];
-                        newTypeDict.Add(type, fl);
-                        Dictionary<int, Dictionary<string, List<FileInfo>>> newDayDict = [];
-                        newDayDict.Add(day, newTypeDict);
-                        Dictionary<int, Dictionary<int, Dictionary<string, List<FileInfo>>>> newMonthDict = [];
-                        newMonthDict.Add(month, newDayDict);
-                        categorizedFiles.Add(year, newMonthDict);
-
+                        categorizedFiles.Add(type, []);
+                        categorizedFiles[type].Add(year, []);
+                        categorizedFiles[type][year].Add(month, []);
+                        categorizedFiles[type][year][month].Add(day, [fileInfo]);
                     }
 
                     if (SeperateByComment)
@@ -414,8 +406,31 @@ namespace AstroIngesterCore
                 }
             }
 
-            if (Verbose) ConsoleHelpers.Muted($"Starting Move Processing...");
+            if (Verbose)
+            {
+                foreach (string type in categorizedFiles.Keys)
+                {
+                    ConsoleHelpers.Muted(type);
+                    foreach (int year in categorizedFiles[type].Keys)
+                    {
+                        ConsoleHelpers.Muted($"|-> {year}");
+                        foreach (int month in categorizedFiles[type][year].Keys)
+                        {
+                            ConsoleHelpers.Muted($" |-> {month}");
+                            foreach (int day in categorizedFiles[type][year][month].Keys)
+                            {
+                                ConsoleHelpers.Muted($"  |-> {day}");
+                                foreach (FileInfo file in categorizedFiles[type][year][month][day])
+                                {
+                                    ConsoleHelpers.Muted($"   |-> {file.Name}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
+            if (Verbose) ConsoleHelpers.Muted($"Starting Move Processing...");
 
         }
     }
