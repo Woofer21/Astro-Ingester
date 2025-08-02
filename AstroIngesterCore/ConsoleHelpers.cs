@@ -4,6 +4,7 @@ namespace AstroIngesterCore
 {
     public class ConsoleHelpers
     {
+        private static object _sync = new object();
 
         private static void Write(string message, bool newLine)
         {
@@ -60,6 +61,22 @@ namespace AstroIngesterCore
                 Console.Write(new String(' ', Console.BufferWidth));
             }
             Console.SetCursorPosition(0, Console.CursorTop);
+        }
+
+        public static void SyncWrite(string message, bool newLine = true, ConsoleColor color = ConsoleColor.White)
+        {
+            lock (_sync)
+            {
+                Log(message, newLine, color);
+            }
+        }
+        public static void SyncWrite(int clearCount, string message, bool newLine = true, ConsoleColor color = ConsoleColor.White)
+        {
+            lock (_sync)
+            {
+                ClearLines(clearCount);
+                Log(message, newLine, color);
+            }
         }
     }
 }

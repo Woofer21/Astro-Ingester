@@ -110,39 +110,6 @@ namespace AstroIngesterCLI
             fileTools.AddOutputPath();
             fileTools.StartMoving();
 
-			//Start processing input files
-   //         string[] directories = Directory.GetDirectories(dirPath, "*", SearchOption.AllDirectories);
-   //         foreach (string directory in directories)
-			//{
-   //             ConsoleHelpers.Muted($"Indexing files in {directory}...");
-   //             string[] files = Directory.GetFiles(directory, "*.*");
-   //             foreach (string fileName in files)
-   //             {
-   //                 ConsoleHelpers.Muted($"Processing file: {fileName}");
-                   
-   //             }
-			//}
-
-            //Directory.CreateDirectory("d:/photography/nikon d5600/images/2026/01/01");
-
-
-			//foreach (string file in files)
-			//{
-			//	try
-   //             {
-   //                 DateTime picDate = MetadataTools.GetDate(file);
-   //                 Console.WriteLine($"{file} - {picDate}");
-
-   //                 string picComment = MetadataTools.GetComment(file);
-			//		if (string.IsNullOrEmpty(picComment)) Console.WriteLine($"{file} - No Comment Added");
-			//		else Console.WriteLine($"{file} - {picComment}");
-   //             }
-			//	catch (Exception e)
-			//	{
-			//		Console.WriteLine("Unhandled Main: " + e.Message);
-			//	}
-			//}
-
 			ConsoleHelpers.Log("Ended");
             Console.ReadLine();
         }

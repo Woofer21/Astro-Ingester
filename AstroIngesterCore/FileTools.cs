@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -165,7 +167,7 @@ namespace AstroIngesterCore
                         string? extentionsInput = Console.ReadLine();
                         if (extentionsInput != null)
                         {
-                            List<string> extentions = [.. extentionsInput.Split(',').Select(ext => ext.Trim())];
+                            List<string> extentions = [.. extentionsInput.Split(',').Select(ext => ext.Trim().ToLower())];
                             pathItem!.Extentions = extentions;
                             ConsoleHelpers.ClearLines(1);
                             ConsoleHelpers.Muted("Selected extentions: ", false);
@@ -206,6 +208,36 @@ namespace AstroIngesterCore
                             {
                                 ConsoleHelpers.ClearLines(2);
                                 ConsoleHelpers.Error($"Invalid path: {path}, please try again");
+                            }
+                        }
+
+                        ConsoleHelpers.Log("Filter by extentions in adition to comments? (Y/n): ", false);
+                        string? extentionsChoice = Console.ReadLine();
+                        if (extentionsChoice != null && (choice.Equals("n", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("no", StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            ConsoleHelpers.ClearLines(1);
+                            ConsoleHelpers.Muted("Filter by extentions in adition to comments? (Y/n): ", false);
+                            ConsoleHelpers.Error("No");
+                        } 
+                        else
+                        {
+                            ConsoleHelpers.ClearLines(1);
+                            ConsoleHelpers.Muted("Filter by extentions in adition to comments? (Y/n): ", false);
+                            ConsoleHelpers.Success("Yes");
+
+                            ConsoleHelpers.Log("Enter the file extentions you would like to copy to this path, seperated by commas (e.g. .jpg, .png, .tif): ", false);
+                            string? extentionsInput = Console.ReadLine();
+                            if (extentionsInput != null)
+                            {
+                                List<string> extentions = [.. extentionsInput.Split(',').Select(ext => ext.Trim().ToLower())];
+                                pathItem!.Extentions = extentions;
+                                ConsoleHelpers.ClearLines(1);
+                                ConsoleHelpers.Muted("Selected extentions: ", false);
+                                ConsoleHelpers.Success(extentionsInput);
+                            }
+                            else
+                            {
+                                ConsoleHelpers.Error("Unkown Error");
                             }
                         }
 
@@ -330,15 +362,19 @@ namespace AstroIngesterCore
         //    }
         //}
 
-        public void StartMoving()
+        public async Task StartMoving()
         {
-            //        extention     ->  year        ->    month     ->    day -> List<FileInfo>
-            Dictionary<string, Dictionary<int, Dictionary<int, Dictionary<int, List<FileInfo>>>>> categorizedFiles = [];
-            Dictionary<string, List<FileInfo>> categorizedByComment = [];
-
             string[] directories = Directory.GetDirectories(InputPath, "*", SearchOption.AllDirectories);
             foreach (string directory in directories)
             {
+                Dictionary<string, List<MoveOperationItem>> categorizedOperations = new()
+                {
+                    { "extention", [] },
+                    { "comment", [] },
+                    { "other", [] }
+                };
+                ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
+
                 if (Verbose) ConsoleHelpers.Muted($"Processing directory: {directory}");
 
                 string[] filePaths = Directory.GetFiles(directory);
@@ -354,84 +390,77 @@ namespace AstroIngesterCore
                     string type = fileInfo.Extension.ToLower();
                     string? comment = MetadataTools.GetComment(filePath);
 
-                    if (categorizedFiles.ContainsKey(type))
+                    if (SeperateByType && OutputPaths.ContainsKey("extention"))
                     {
-                        if (categorizedFiles[type].ContainsKey(year))
+                        foreach (OutputPathItem pathitem in OutputPaths["extention"])
                         {
-                            if (categorizedFiles[type][year].ContainsKey(month))
+                            if (pathitem.Extentions.Contains(type))
                             {
-                                if (categorizedFiles[type][year][month].ContainsKey(day))
-                                {
-                                    categorizedFiles[type][year][month][day].Add(fileInfo);
-                                }
-                                else
-                                {
-                                    categorizedFiles[type][year][month].Add(day, [fileInfo]);
-                                }
+                                string outputPath = Path.Combine(pathitem.Path, year.ToString(), month.ToString(), day.ToString());
+                                MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
+                                categorizedOperations["extention"].Add(moveItem);
                             }
-                            else
-                            {
-                                categorizedFiles[type][year].Add(month, []);
-                                categorizedFiles[type][year][month].Add(day, [fileInfo]);
-                            }
-                        }
-                        else
-                        {
-                            categorizedFiles[type].Add(year, []);
-                            categorizedFiles[type][year].Add(month, []);
-                            categorizedFiles[type][year][month].Add(day, [fileInfo]);
-                        }
-                    }
-                    else
-                    {
-                        categorizedFiles.Add(type, []);
-                        categorizedFiles[type].Add(year, []);
-                        categorizedFiles[type][year].Add(month, []);
-                        categorizedFiles[type][year][month].Add(day, [fileInfo]);
-                    }
-
-                    if (SeperateByComment)
-                    {
-                        if (comment != null)
-                        {
-                            if (!categorizedByComment.ContainsKey(comment))
-                            {
-                                categorizedByComment[comment] = [];
-                            }
-                            categorizedByComment[comment].Add(fileInfo);
                         }
                     }
 
-                    if (Verbose) ConsoleHelpers.Muted($" |--> Categorized: {year}, {month}, {day}, {type}{(SeperateByComment ? $", {comment}" : "")}");
+                    if (SeperateByComment && OutputPaths.ContainsKey("comment"))
+                    {
+                        foreach (OutputPathItem pathItem in OutputPaths["comment"])
+                        {
+                            if (pathItem.Comments.Contains(comment))
+                            {
+                                string outputPath = Path.Combine(pathItem.Path);
+                                MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
+                                categorizedOperations["comment"].Add(moveItem);
+                            }
+                        }
+                    }
+
+                    if (OutputPaths.ContainsKey("other"))
+                    {
+                        foreach (OutputPathItem pathItem in OutputPaths["other"])
+                        {
+                            string outputPath = Path.Combine(pathItem.Path, year.ToString(), month.ToString(), day.ToString());
+                            MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
+                            categorizedOperations["other"].Add(moveItem);
+                        }
+                    }
                 }
-            }
 
-            if (Verbose)
-            {
-                foreach (string type in categorizedFiles.Keys)
+                foreach (string typeKey in categorizedOperations.Keys)
                 {
-                    ConsoleHelpers.Muted(type);
-                    foreach (int year in categorizedFiles[type].Keys)
+                    await Task.Run(() =>
                     {
-                        ConsoleHelpers.Muted($"|-> {year}");
-                        foreach (int month in categorizedFiles[type][year].Keys)
+                        int count = 0;
+                        int totalCount = categorizedOperations[typeKey].Count;
+                        Parallel.ForEach(categorizedOperations[typeKey], parallelOptions, operation =>
                         {
-                            ConsoleHelpers.Muted($" |-> {month}");
-                            foreach (int day in categorizedFiles[type][year][month].Keys)
+                            try
                             {
-                                ConsoleHelpers.Muted($"  |-> {day}");
-                                foreach (FileInfo file in categorizedFiles[type][year][month][day])
-                                {
-                                    ConsoleHelpers.Muted($"   |-> {file.Name}");
-                                }
+                                if (!Directory.Exists(operation.DestinationPath))
+                                    Directory.CreateDirectory(operation.DestinationPath);
+
+                                string destPath = Path.Combine(operation.DestinationPath, operation.Name);
+
+                                if (File.Exists(operation.SourcePath))
+                                    File.Copy(operation.SourcePath, destPath, false);
+                                
+                                count++;
+                                float progressDecimal = (float)count / totalCount;
+                                string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
+                                ConsoleHelpers.SyncWrite(1, $"Processing {typeKey} list {progressBar} ({count}/{totalCount}) ({operation.Name})", true, ConsoleColor.DarkGray);
                             }
-                        }
-                    }
+                            catch (Exception error)
+                            {
+                                ConsoleHelpers.Error($"Error processing file {operation.SourcePath}: {error.Message}");
+                            }
+                        });
+                        ConsoleHelpers.ClearLines(1);
+                        ConsoleHelpers.Success($"Successfully processed {count}/{totalCount} files");
+                        ConsoleHelpers.Muted(" ");
+                    });
                 }
             }
-
-            if (Verbose) ConsoleHelpers.Muted($"Starting Move Processing...");
-
         }
     }
 }
