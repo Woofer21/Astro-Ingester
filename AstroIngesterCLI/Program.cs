@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using AstroIngesterCore;
 
 namespace AstroIngesterCLI
@@ -15,14 +16,33 @@ namespace AstroIngesterCLI
 
             if (args.Length > 0)
             {
-                foreach (string arg in args)
+                for (int i = 0; i < args.Length; i++)
                 {
+                    string arg = args[i];
                     switch (arg.ToLower())
                     {
                         case "--verbose":
                         case "-v":
                             ConsoleHelpers.Log("Verbose mode enabled", true, ConsoleColor.Yellow);
                             fileTools.Verbose = true;
+                            break;
+                        case "--config":
+                        case "-c":
+                            if (args.Length <= i + 1)
+                            {
+                                ConsoleHelpers.Error("No config file path provided after config argumment");
+                                break;
+                            }
+
+                            string configPath = args[i + 1];
+                            ConsoleHelpers.Info($"Loading config from: {configPath}");
+
+                            if (!File.Exists(configPath))
+                            {
+                                ConsoleHelpers.Error($"Config file at {configPath} does not exist.");
+                                break;
+                            }
+
                             break;
                     }
                 }

@@ -2,7 +2,7 @@
   "profiles": {
     "AstroIngesterCLI": {
       "commandName": "Project",
-      "commandLineArgs": "--verbose"
+      "commandLineArgs": "--verbose\r\n--config \"e/testing/cool folder/testing\""
     }
   }
 }
