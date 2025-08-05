@@ -49,7 +49,7 @@ namespace AstroIngesterCLI
                         didntFail &= handleInputPath(key, value);
                         if (didntFail)
                             ConsoleHelpers.Muted("[CNFG] Loaded input path: ", false);
-
+                            ConsoleHelpers.Success(value);
                         break;
                 }
             }
