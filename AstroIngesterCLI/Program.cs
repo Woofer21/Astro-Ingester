@@ -43,6 +43,15 @@ namespace AstroIngesterCLI
                                 break;
                             }
 
+                            FileInfo configFile = new(configPath);
+                            if (configFile.Extension != ".txt")
+                            {
+                                ConsoleHelpers.Error("Config file must be a .txt file.");
+                                break;
+                            }
+
+                            ConfigManager cfmg = new(fileTools);
+                            cfmg.LoadConfig(configFile);
                             break;
                     }
                 }
