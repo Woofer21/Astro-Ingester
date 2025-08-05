@@ -8,17 +8,12 @@ using System.Threading.Tasks;
 
 namespace AstroIngesterCLI
 {
-    internal class ConfigManager
-    {
-        private FileTools _fileTools;
+    internal class ConfigManager (FileTools fileTools)
+	{
+        private readonly FileTools _fileTools = fileTools;
         private bool _inputPathSet = false;
 
-        public ConfigManager(FileTools fileTools)
-        {
-            _fileTools = fileTools;
-        }
-
-        public bool LoadConfig(FileInfo configFileInfo)
+		public bool LoadConfig(FileInfo configFileInfo)
         {
             bool didntFail = true;
 
@@ -46,7 +41,7 @@ namespace AstroIngesterCLI
                     case "InputPath":
                     case "Input_Path":
                     case "input_path":
-                        didntFail &= handleInputPath(key, value);
+                        didntFail &= HandleInputPath(key, value);
                         if (didntFail)
                             ConsoleHelpers.Muted("[CNFG] Loaded input path: ", false);
                             ConsoleHelpers.Success(value);
@@ -57,7 +52,7 @@ namespace AstroIngesterCLI
             return didntFail;
         }
 
-        private bool handleInputPath(string key, string value)
+        private bool HandleInputPath(string key, string value)
         {
             if (_inputPathSet)
             {
