@@ -43,8 +43,9 @@ namespace AstroIngesterCLI
                     case "input_path":
                         didntFail &= HandleInputPath(key, value);
                         if (didntFail)
-                            ConsoleHelpers.Muted("[CNFG] Loaded input path: ", false);
-                            ConsoleHelpers.Success(value);
+                        {
+                            ConsoleHelpers.Muted($"[info(CNFG)] Loaded input path: success({value})");
+                        }
                         break;
                 }
             }
