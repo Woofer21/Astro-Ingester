@@ -28,24 +28,30 @@ namespace AstroIngesterCLI
                 string[] parts = line.Split('=');
                 if (parts.Length != 2)
                 {
-                    ConsoleHelpers.Error($"Invalid config line at {configFileInfo.FullName}:{i + 1}: '{line}'");
+                    Error($"Invalid config line at {configFileInfo.FullName}:{i + 1}: '{line}'");
                     didntFail = false;
                     continue;
                 }
 
                 string key = parts[0].Trim();
-                string value = parts[1].Trim();
+                string value = parts[1].Trim().Trim('"').Trim();
 
-                switch(key)
+                switch(key.ToLower())
                 {
-                    case "InputPath":
-                    case "Input_Path":
+                    case "verbose":
+                        if (value.ToLower() == "true")
+                        {
+                            _fileTools.Verbose = true;
+                            Warning("Verbose enabled");
+                        }
+                        break;
+                    case "inputpath":
                     case "input_path":
                         didntFail &= HandleInputPath(key, value);
+
                         if (didntFail)
-                        {
-                            ConsoleHelpers.Muted($"[info(CNFG)] Loaded input path: success({value})");
-                        }
+                            Info($"Loaded {key}: {value}");
+
                         break;
                 }
             }
@@ -57,25 +63,40 @@ namespace AstroIngesterCLI
         {
             if (_inputPathSet)
             {
-                ConsoleHelpers.Error($"You can only have one {key} set");
+                Error($"You can only have one {key} set");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(value))
             {
-                ConsoleHelpers.Error($"{key} must be passed a value and can not be empty");
+                Error($"{key} must be passed a value and can not be empty");
                 return false;
             }
 
             if (!Directory.Exists(value))
             {
-                ConsoleHelpers.Error($"{key} directory does not exist.");
+                Error($"{key} directory does not exist.");
                 return false;
             }
 
             _fileTools.ManuallySelectDrive(value);
             _inputPathSet = true;
 			return true;
+        }
+
+
+        // ConfigManager logging helper functions
+        private void Info(string message)
+        {
+            ConsoleHelpers.Muted($"[info(CNFG)] {message}");
+        }
+        private void Warning(string message)
+        {
+            ConsoleHelpers.Muted($"[warning(CNFG)] {message}");
+        }
+        private void Error(string message)
+        {
+            ConsoleHelpers.Muted($"[error(CNFG)] error({message})");
         }
     }
 }

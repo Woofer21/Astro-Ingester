@@ -35,7 +35,7 @@ namespace AstroIngesterCLI
                             }
 
                             string configPath = args[i + 1];
-                            ConsoleHelpers.Info($"[CNFG] Loading config from: success({configPath})");
+                            ConsoleHelpers.Muted($"[info(CNFG)] Loading config from: {configPath}");
 
                             if (!File.Exists(configPath))
                             {
