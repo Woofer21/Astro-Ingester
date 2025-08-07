@@ -43,7 +43,9 @@ namespace AstroIngesterCore
         {
             //Set base color for the message & get the matches
             Console.ForegroundColor = baseColor;
-            MatchCollection matches = Regex.Matches(message, @"\w+\([^)]+\)");
+            MatchCollection matches = Regex.Matches(message, @"\w+\([^)]+.\)");
+            Regex firstParenRegex = new(@"\(");
+            Regex lastParenRegex = new(@"\)");
 
             if (matches.Count > 0)
             {
@@ -54,12 +56,16 @@ namespace AstroIngesterCore
                 for (int i = 0; i < captureCount; i++)
                 {
                     Capture capture = matches[i];
+                    string value = capture.Value;
                     int captureStart = capture.Index;
 
                     //Split out the color & the actual text content
-                    string[] parts = capture.Value.Split('(');
-                    ConsoleColor partColor = _colorMaps.GetValueOrDefault(parts[0].ToLower(), ConsoleColor.White);
-                    string coloredText = parts[1].Trim(')');
+                    int endOfColorIndx = value.IndexOf('(');
+                    string colorCode = value.Substring(0, endOfColorIndx);
+                    ConsoleColor partColor = _colorMaps.GetValueOrDefault(colorCode, ConsoleColor.White);
+
+                    string textContent = value.Substring(endOfColorIndx);
+                    string coloredText = firstParenRegex.Replace(lastParenRegex.Replace(textContent, "", 1, textContent.Length - 1), "", 1).Trim();
 
 
                     if (i == 0)

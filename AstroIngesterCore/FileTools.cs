@@ -46,8 +46,7 @@ namespace AstroIngesterCore
                     if (Directory.Exists(pathName)) {
                         inputPath = pathName;
                         ConsoleHelpers.ClearLines(4);
-                        ConsoleHelpers.Muted("Selected input path: ", false);
-                        ConsoleHelpers.Success(inputPath);
+                        ConsoleHelpers.Muted($"Selected input path: success({inputPath})");
                         return true;
                     } else
                     {
@@ -94,15 +93,13 @@ namespace AstroIngesterCore
                             {
                                 selecting = false;
                                 ConsoleHelpers.ClearLines(2);
-                                ConsoleHelpers.Muted($"Select {dirName}? (Y/n): ", false);
-                                ConsoleHelpers.Error("No");
+                                ConsoleHelpers.Muted($"Select {dirName}? (Y/n): error(No)");
                                 return false;
                             } else
                             {
                                 inputPath = dirName;
                                 ConsoleHelpers.ClearLines(2);
-                                ConsoleHelpers.Muted($"Select {dirName}? (Y/n): ", false);
-                                ConsoleHelpers.Success("Yes");
+                                ConsoleHelpers.Muted($"Select {dirName}? (Y/n): success(Yes)");
                                 return true;
                             }
                         }
@@ -121,12 +118,10 @@ namespace AstroIngesterCore
             while (chooseLoop)
             {
                 int menuLineCount = 8;
-                ConsoleHelpers.Log("Choose an option from the list: ", true);
+                ConsoleHelpers.Log("Choose an option from the list: ");
                 ConsoleHelpers.Log("1) Add an output path for a specifed file extention", true, SeperateByType ? ConsoleColor.White : ConsoleColor.DarkGray);
                 ConsoleHelpers.Log("2) Add an output path for a specified comment content", true, SeperateByComment ? ConsoleColor.White : ConsoleColor.DarkGray);
-                ConsoleHelpers.Log("3) Add an output path for all others", false, IgnoreUncategorized ? ConsoleColor.DarkGray : ConsoleColor.White);
-                if (!IgnoreUncategorized) ConsoleHelpers.Error(" (required)");
-                else ConsoleHelpers.Log("");
+                ConsoleHelpers.Log($"3) Add an output path for all others {(!IgnoreUncategorized ? "error((required))" : "")}", true, IgnoreUncategorized ? ConsoleColor.DarkGray : ConsoleColor.White);
                 ConsoleHelpers.Log("4) View current output paths", true, OutputPaths.Count > 0 ? ConsoleColor.White : ConsoleColor.DarkGray);
                 ConsoleHelpers.Log("5) Continue Program", true, !IgnoreUncategorized ? choseOutputForAll ? ConsoleColor.White : ConsoleColor.DarkGray : ConsoleColor.White);
                 ConsoleHelpers.Log("-1) Quit program\n> ", false);
@@ -152,8 +147,7 @@ namespace AstroIngesterCore
                             {
                                 pathItem = new OutputPathItem(path);
                                 ConsoleHelpers.ClearLines(2);
-                                ConsoleHelpers.Muted("Selected output path: ", false);
-                                ConsoleHelpers.Success($"{path}/year/month/day");
+                                ConsoleHelpers.Muted($"Selected output path: success({path}/year/month/day)");
                                 loop = false;
                             } 
                             else
@@ -170,8 +164,7 @@ namespace AstroIngesterCore
                             List<string> extentions = [.. extentionsInput.Split(',').Select(ext => ext.Trim().ToLower())];
                             pathItem!.Extentions = extentions;
                             ConsoleHelpers.ClearLines(1);
-                            ConsoleHelpers.Muted("Selected extentions: ", false);
-                            ConsoleHelpers.Success(extentionsInput);
+                            ConsoleHelpers.Muted($"Selected extentions: success({extentionsInput})");
                         } 
                         else
                         {
@@ -200,8 +193,7 @@ namespace AstroIngesterCore
                             {
                                 pathItem = new OutputPathItem(path);
                                 ConsoleHelpers.ClearLines(2);
-                                ConsoleHelpers.Muted("Selected output path: ", false);
-                                ConsoleHelpers.Success($"{path}/");
+                                ConsoleHelpers.Muted($"Selected output path: success({path}/)");
                                 loop = false;
                             }
                             else
@@ -216,14 +208,12 @@ namespace AstroIngesterCore
                         if (extentionsChoice != null && (choice.Equals("n", StringComparison.CurrentCultureIgnoreCase) || choice.Equals("no", StringComparison.CurrentCultureIgnoreCase)))
                         {
                             ConsoleHelpers.ClearLines(1);
-                            ConsoleHelpers.Muted("Filter by extentions in adition to comments? (Y/n): ", false);
-                            ConsoleHelpers.Error("No");
+                            ConsoleHelpers.Muted("Filter by extentions in adition to comments? (Y/n): error(No)");
                         } 
                         else
                         {
                             ConsoleHelpers.ClearLines(1);
-                            ConsoleHelpers.Muted("Filter by extentions in adition to comments? (Y/n): ", false);
-                            ConsoleHelpers.Success("Yes");
+                            ConsoleHelpers.Muted("Filter by extentions in adition to comments? (Y/n): success(Yes)");
 
                             ConsoleHelpers.Log("Enter the file extentions you would like to copy to this path, seperated by commas (e.g. .jpg, .png, .tif): ", false);
                             string? extentionsInput = Console.ReadLine();
@@ -232,8 +222,7 @@ namespace AstroIngesterCore
                                 List<string> extentions = [.. extentionsInput.Split(',').Select(ext => ext.Trim().ToLower())];
                                 pathItem!.Extentions = extentions;
                                 ConsoleHelpers.ClearLines(1);
-                                ConsoleHelpers.Muted("Selected extentions: ", false);
-                                ConsoleHelpers.Success(extentionsInput);
+                                ConsoleHelpers.Muted($"Selected extentions: success({extentionsInput})");
                             }
                             else
                             {
@@ -248,8 +237,7 @@ namespace AstroIngesterCore
                             List<string> comments = [.. commentsInput.Split(',').Select(ext => ext.Trim())];
                             pathItem!.Comments = comments;
                             ConsoleHelpers.ClearLines(1);
-                            ConsoleHelpers.Muted("Comment to check against: ", false);
-                            ConsoleHelpers.Success(commentsInput);
+                            ConsoleHelpers.Muted($"Comment to check against: success({commentsInput})");
                         }
                         else
                         {
@@ -282,8 +270,7 @@ namespace AstroIngesterCore
                                     OutputPaths["other"].Add(new OutputPathItem(path));
 
                                 ConsoleHelpers.ClearLines(2);
-                                ConsoleHelpers.Muted("Selected output path: ", false);
-                                ConsoleHelpers.Success($"{path}/year/month/day");
+                                ConsoleHelpers.Muted($"Selected output path: success({path}/year/month/day)");
                                 loop = false;
                             }
                             else

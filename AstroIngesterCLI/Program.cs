@@ -30,23 +30,23 @@ namespace AstroIngesterCLI
                         case "-c":
                             if (args.Length <= i + 1)
                             {
-                                ConsoleHelpers.Error("No config file path provided after config argumment");
+                                ConsoleHelpers.Error("[CNFG] No config file path provided after config argumment");
                                 break;
                             }
 
                             string configPath = args[i + 1];
-                            ConsoleHelpers.Info($"Loading config from: {configPath}");
+                            ConsoleHelpers.Info($"[CNFG] Loading config from: success({configPath})");
 
                             if (!File.Exists(configPath))
                             {
-                                ConsoleHelpers.Error($"Config file at {configPath} does not exist.");
+                                ConsoleHelpers.Error($"[CNFG] Config file at {configPath} does not exist.");
                                 break;
                             }
 
                             FileInfo configFile = new(configPath);
                             if (configFile.Extension != ".txt")
                             {
-                                ConsoleHelpers.Error("Config file must be a .txt file.");
+                                ConsoleHelpers.Error("[CNFG] Config file must be a .txt file.");
                                 break;
                             }
 
@@ -79,15 +79,13 @@ namespace AstroIngesterCLI
 				{
                     fileTools.SeperateByType = false;
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted(splitQuestion, false);
-                    ConsoleHelpers.Error("No");
+                    ConsoleHelpers.Muted($"{splitQuestion}error(No)");
                 }
                 else
 				{
                     fileTools.SeperateByType = true;
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted(splitQuestion, false);
-                    ConsoleHelpers.Success("Yes");
+                    ConsoleHelpers.Muted($"{splitQuestion}success(Yes)");
                 }
             }
 
@@ -102,15 +100,13 @@ namespace AstroIngesterCLI
                     {
                         fileTools.IgnoreUncategorized = false;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
-                        ConsoleHelpers.Muted(ignoreQuestion, false);
-                        ConsoleHelpers.Success("Yes");
+                        ConsoleHelpers.Muted($"{ignoreQuestion}success(Yes)");
                     }
                     else
                     {
                         fileTools.IgnoreUncategorized = true;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
-                        ConsoleHelpers.Muted(ignoreQuestion, false);
-                        ConsoleHelpers.Error("No");
+                        ConsoleHelpers.Muted($"{ignoreQuestion}error(No)");
                     }
                 }
             }
@@ -124,15 +120,13 @@ namespace AstroIngesterCLI
                 {
                     fileTools.SeperateByComment = false;
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted(commentQuestion, false);
-                    ConsoleHelpers.Error("No");
+                    ConsoleHelpers.Muted($"{commentQuestion}error(No)");
                 }
                 else
                 {
                     fileTools.SeperateByComment = true;
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted(commentQuestion, false);
-                    ConsoleHelpers.Success("Yes");
+                    ConsoleHelpers.Muted($"{commentQuestion}success(Yes)");
                 }
             }
 
