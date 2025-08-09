@@ -53,6 +53,10 @@ namespace AstroIngesterCLI
                             Info($"Loaded {key}: {value}");
 
                         break;
+                    default:
+                        Error($"Unknown config key '{key}' at {configFileInfo.FullName}:{i + 1}");
+                        didntFail = false;
+                        break;
                 }
             }
 
