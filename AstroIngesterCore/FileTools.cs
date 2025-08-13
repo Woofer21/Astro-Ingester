@@ -302,15 +302,40 @@ namespace AstroIngesterCore
                                     lineCount++;
                                     OutputPathItem pathItem = outputPathItems[j];
                                     ConsoleHelpers.Log($"|-> Output Path {j + 1}: {pathItem.Path}", true, color);
-                                    if (pathItem.Extentions.Count > 0)
+                                    if (pathItem.HasExtentions)
                                     {
                                         lineCount++;
-                                        ConsoleHelpers.Log(" |-> Extentions: " + string.Join(", ", pathItem.Extentions), true, color);
+                                        ConsoleHelpers.Log(" |-> Extensions: " + string.Join(", ", pathItem.Extensions), true, color);
                                     }
-                                    if (pathItem.Comments.Count > 0)
+                                    if (pathItem.HasComments)
                                     {
                                         lineCount++;
-                                        ConsoleHelpers.Log(" |-> Comments: " + string.Join(", ", pathItem.Comments), true, color);
+                                        ConsoleHelpers.Log(" |-> Comments: " + string.Join(", ", pathItem.Comments2), true, color);
+                                    }
+                                    if (pathItem.HasBeforeDates)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> Before Dates: " + string.Join(", ", pathItem.BeforeDates), true, color);
+                                    }
+                                    if (pathItem.HasAfterDates)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> After Dates: " + string.Join(", ", pathItem.AfterDates), true, color);
+                                    }
+                                    if (pathItem.HasDays)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> Days: " + string.Join(", ", pathItem.Days), true, color);
+                                    }
+                                    if (pathItem.HasMonths)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> Months: " + string.Join(", ", pathItem.Months), true, color);
+                                    }
+                                    if (pathItem.HasYears)
+                                    {
+                                        lineCount++;
+                                        ConsoleHelpers.Log(" |-> Years: " + string.Join(", ", pathItem.Years), true, color);
                                     }
                                 }
                             }
@@ -333,6 +358,13 @@ namespace AstroIngesterCore
                         ConsoleHelpers.ClearLines(menuLineCount);
                 }
             }
+        }
+        public void AddOutputPath(OutputPathItem pathItem, string key)
+        {
+            if (!OutputPaths.ContainsKey(key))
+                OutputPaths.Add(key, []);
+
+            OutputPaths[key].Add(pathItem);
         }
 
         //public bool AddOutputPath(string path)

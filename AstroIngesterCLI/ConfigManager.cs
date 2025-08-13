@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AstroIngesterCLI
@@ -47,10 +48,29 @@ namespace AstroIngesterCLI
                         break;
                     case "inputpath":
                     case "input_path":
-                        didntFail &= HandleInputPath(key, value);
+                        bool inputSucc = HandleInputPath(key, value);
+                        didntFail &= inputSucc;
 
-                        if (didntFail)
+                        if (inputSucc)
                             Info($"Loaded {key}: {value}");
+
+                        break;
+                    case "outputsort":
+                    case "output_sort":
+                        bool outSortSucc = HandleOutputPath(key, value, i + 1, "sort");
+                        didntFail &= outSortSucc;
+
+                        if (outSortSucc)
+                            Info($"Loaded {key}: {value.Split(',')[0]}");
+
+                        break;
+                    case "outputcopy":
+                    case "output_copy":
+                        bool outCopySucc = HandleOutputPath(key, value, i + 1, "copy");
+                        didntFail &= outCopySucc;
+
+                        if (outCopySucc)
+                            Info($"Loaded {key}: {value.Split(',')[0]}");
 
                         break;
                     default:
@@ -88,6 +108,165 @@ namespace AstroIngesterCLI
 			return true;
         }
 
+        private bool HandleOutputPath(string key, string value, int lineNumber, string type)
+        {
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Error($"{key} must be passed a value and can not be empty");
+                return false;
+            }
+
+            int pathLength = value.Split(',')[0].Length;
+            string sortPath = value.Split(',')[0].Trim('"').Trim();
+            string allOptions = value.Substring(pathLength).Trim(',').Trim();
+
+            MatchCollection matches = Regex.Matches(allOptions, @"\w+\[[^\]]+.\]");
+
+            if (string.IsNullOrWhiteSpace(sortPath))
+            {
+                Error($"{key} at line {lineNumber} must be passed a path and can not be empty");
+                return false;
+            }
+
+            if (!Directory.Exists(sortPath))
+            {
+                Error($"First argument of {key} at line {lineNumber} must be a valid directory path");
+                return false;
+            }
+
+            OutputPathItem outputPathItem = new(sortPath);
+
+            if (matches.Count > 0)
+            {
+                foreach (Capture capture in matches)
+                {
+                    string captureValue = capture.Value;
+                    string[] captureParts = captureValue.Split('[');
+
+                    string argKey = captureParts[0].Trim().ToLower();
+                    string[] options = captureParts[1].Split(',');
+
+                    foreach (string option in options)
+                    {
+                        string cleanOption = option.Trim(']').Trim();
+
+                        if (string.IsNullOrWhiteSpace(cleanOption))
+                        {
+                            Error($"Invalid option '{option}' for {key} at line {lineNumber}");
+                            return false;
+                        }
+
+                        bool isAllValid = ConfigHelpers.ValidateSharedArgs(argKey, cleanOption, key, lineNumber, outputPathItem);
+
+                        if (!isAllValid)
+                        {
+                            Error($"Unknown error processing option '{cleanOption}' for {key} at line {lineNumber}");
+                        }
+
+                        //switch(argKey)
+                        //{
+                        //    case "extension":
+                        //        if (!ConfigHelpers.ValidateExtension(cleanOption))
+                        //        {
+                        //            Error($"Invalid extension '{cleanOption}' for {key} at line {lineNumber}. Extensions must start with a '.'");
+                        //            return false;
+                        //        }
+
+                        //        outputPathItem.AddExtension(cleanOption);
+
+                        //        break;
+                        //    case "comment":
+                        //        outputPathItem.AddComment(cleanOption);
+
+                        //        break;
+                        //    case "beforedate":
+                        //    case "before_date":
+                        //        if (!ConfigHelpers.ValidateDate(cleanOption, out DateTime dateParseResult))
+                        //        {
+                        //            Error($"Invalid date '{cleanOption}' for {key} at line {lineNumber}. Expected valid date format.");
+                        //            return false;
+                        //        }
+
+                        //        outputPathItem.AddBeforeDate(dateParseResult);
+
+                        //        break;
+                        //    case "afterdate":
+                        //    case "after_date":
+                        //        if (!ConfigHelpers.ValidateDate(cleanOption, out DateTime afterDateParseResult))
+                        //        {
+                        //            Error($"Invalid date '{cleanOption}' for {key} at line {lineNumber}. Expected valid date format.");
+                        //            return false;
+                        //        }
+
+                        //        outputPathItem.AddAfterDate(afterDateParseResult);
+
+                        //        break;
+                        //    case "day":
+                        //        bool validDay = ConfigHelpers.ValidateDay(cleanOption, out int dayParseResult, out string dayErrorCode);
+
+                        //        if (!validDay)
+                        //        {
+                        //            switch (dayErrorCode)
+                        //            {
+                        //                case "invalid_format":
+                        //                    Error($"Invalid day '{cleanOption}' for {key} at line {lineNumber}. Expected a number value.");
+                        //                    break;
+                        //                case "invalid_day":
+                        //                    Error($"Invalid day '{cleanOption}' for {key} at line {lineNumber}. Day must be between 1 and 31.");
+                        //                    break;
+                        //                default:
+                        //                    Error($"Unknown error validating day '{cleanOption}' for {key} at line {lineNumber}");
+                        //                    break;
+                        //            }
+
+                        //            return false;
+                        //        }
+
+                        //        outputPathItem.AddDay(dayParseResult);
+
+                        //        break;
+                        //    case "month":
+                        //        if (!int.TryParse(cleanOption, out int monthParseInt))
+                        //        {
+                        //            Error($"Invalid month '{cleanOption}' for {key} at line {lineNumber}. Expected a number value.");
+                        //            return false;
+                        //        }
+                        //        if (monthParseInt < 1 || monthParseInt > 12)
+                        //        {
+                        //            Error($"Invalid month '{cleanOption}' for {key} at line {lineNumber}. Month must be between 1 and 12.");
+                        //            return false;
+                        //        }
+
+                        //        outputPathItem.AddMonth(monthParseInt);
+
+                        //        break;
+                        //    case "year":
+                        //        if (!int.TryParse(cleanOption, out int yearParseInt))
+                        //        {
+                        //            Error($"Invalid year '{cleanOption}' for {key} at line {lineNumber}. Expected a number value.");
+                        //            return false;
+                        //        }
+                        //        if (yearParseInt < 1900 || yearParseInt > DateTime.Now.Year)
+                        //        {
+                        //            Error($"Invalid year '{cleanOption}' for {key} at line {lineNumber}. Year must be between 1900 and {DateTime.Now.Year}.");
+                        //            return false;
+                        //        }
+
+                        //        outputPathItem.AddYear(yearParseInt);
+
+                        //        break;
+                        //    default:
+                        //        Error($"Unknown option '{argKey}' in {key} at line {lineNumber}");
+                        //        return false;
+                        //}
+                    }
+                }
+            }
+
+            _fileTools.AddOutputPath(outputPathItem, type);
+            return true;
+        }
 
         // ConfigManager logging helper functions
         private void Info(string message)
