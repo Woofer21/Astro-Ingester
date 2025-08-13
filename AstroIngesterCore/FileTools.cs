@@ -559,6 +559,8 @@ namespace AstroIngesterCore
 
                 foreach (string typeKey in categorizedOperations.Keys)
                 {
+                    ConsoleHelpers.Muted(" ");
+
                     await Task.Run(() =>
                     {
                         int count = 0;
@@ -576,9 +578,6 @@ namespace AstroIngesterCore
                                 if (File.Exists(operation.SourcePath))
                                     File.Copy(operation.SourcePath, destPath, false);
 
-                                if (count == 0)
-                                    ConsoleHelpers.Muted(" ");
-
                                 count++;
                                 float progressDecimal = (float)count / totalCount;
                                 string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
@@ -586,9 +585,6 @@ namespace AstroIngesterCore
                             }
                             catch (Exception error)
                             {
-                                if (count == 0)
-                                    ConsoleHelpers.Muted(" ");
-
                                 count++;
                                 errorCount++;
                                 float progressDecimal = (float)count / totalCount;
