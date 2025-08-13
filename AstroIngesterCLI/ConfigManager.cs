@@ -121,7 +121,7 @@ namespace AstroIngesterCLI
             string sortPath = value.Split(',')[0].Trim('"').Trim();
             string allOptions = value.Substring(pathLength).Trim(',').Trim();
 
-            MatchCollection matches = Regex.Matches(allOptions, @"\w+\[[^\]]+.\]");
+            MatchCollection matches = Regex.Matches(allOptions, @"\w+\[[^\]]+\]");
 
             if (string.IsNullOrWhiteSpace(sortPath))
             {
@@ -163,103 +163,6 @@ namespace AstroIngesterCLI
                         {
                             Error($"Unknown error processing option '{cleanOption}' for {key} at line {lineNumber}");
                         }
-
-                        //switch(argKey)
-                        //{
-                        //    case "extension":
-                        //        if (!ConfigHelpers.ValidateExtension(cleanOption))
-                        //        {
-                        //            Error($"Invalid extension '{cleanOption}' for {key} at line {lineNumber}. Extensions must start with a '.'");
-                        //            return false;
-                        //        }
-
-                        //        outputPathItem.AddExtension(cleanOption);
-
-                        //        break;
-                        //    case "comment":
-                        //        outputPathItem.AddComment(cleanOption);
-
-                        //        break;
-                        //    case "beforedate":
-                        //    case "before_date":
-                        //        if (!ConfigHelpers.ValidateDate(cleanOption, out DateTime dateParseResult))
-                        //        {
-                        //            Error($"Invalid date '{cleanOption}' for {key} at line {lineNumber}. Expected valid date format.");
-                        //            return false;
-                        //        }
-
-                        //        outputPathItem.AddBeforeDate(dateParseResult);
-
-                        //        break;
-                        //    case "afterdate":
-                        //    case "after_date":
-                        //        if (!ConfigHelpers.ValidateDate(cleanOption, out DateTime afterDateParseResult))
-                        //        {
-                        //            Error($"Invalid date '{cleanOption}' for {key} at line {lineNumber}. Expected valid date format.");
-                        //            return false;
-                        //        }
-
-                        //        outputPathItem.AddAfterDate(afterDateParseResult);
-
-                        //        break;
-                        //    case "day":
-                        //        bool validDay = ConfigHelpers.ValidateDay(cleanOption, out int dayParseResult, out string dayErrorCode);
-
-                        //        if (!validDay)
-                        //        {
-                        //            switch (dayErrorCode)
-                        //            {
-                        //                case "invalid_format":
-                        //                    Error($"Invalid day '{cleanOption}' for {key} at line {lineNumber}. Expected a number value.");
-                        //                    break;
-                        //                case "invalid_day":
-                        //                    Error($"Invalid day '{cleanOption}' for {key} at line {lineNumber}. Day must be between 1 and 31.");
-                        //                    break;
-                        //                default:
-                        //                    Error($"Unknown error validating day '{cleanOption}' for {key} at line {lineNumber}");
-                        //                    break;
-                        //            }
-
-                        //            return false;
-                        //        }
-
-                        //        outputPathItem.AddDay(dayParseResult);
-
-                        //        break;
-                        //    case "month":
-                        //        if (!int.TryParse(cleanOption, out int monthParseInt))
-                        //        {
-                        //            Error($"Invalid month '{cleanOption}' for {key} at line {lineNumber}. Expected a number value.");
-                        //            return false;
-                        //        }
-                        //        if (monthParseInt < 1 || monthParseInt > 12)
-                        //        {
-                        //            Error($"Invalid month '{cleanOption}' for {key} at line {lineNumber}. Month must be between 1 and 12.");
-                        //            return false;
-                        //        }
-
-                        //        outputPathItem.AddMonth(monthParseInt);
-
-                        //        break;
-                        //    case "year":
-                        //        if (!int.TryParse(cleanOption, out int yearParseInt))
-                        //        {
-                        //            Error($"Invalid year '{cleanOption}' for {key} at line {lineNumber}. Expected a number value.");
-                        //            return false;
-                        //        }
-                        //        if (yearParseInt < 1900 || yearParseInt > DateTime.Now.Year)
-                        //        {
-                        //            Error($"Invalid year '{cleanOption}' for {key} at line {lineNumber}. Year must be between 1900 and {DateTime.Now.Year}.");
-                        //            return false;
-                        //        }
-
-                        //        outputPathItem.AddYear(yearParseInt);
-
-                        //        break;
-                        //    default:
-                        //        Error($"Unknown option '{argKey}' in {key} at line {lineNumber}");
-                        //        return false;
-                        //}
                     }
                 }
             }

@@ -283,70 +283,10 @@ namespace AstroIngesterCore
                     }
                     else if (choice == "4" && OutputPaths.Count > 0)
                     {
-                        int lineCount = 0;
+                        PrintOutputPaths(true, out int lineCount);
 
                         ConsoleHelpers.ClearLines(menuLineCount);
                         ConsoleHelpers.Success("4) View current output paths");
-
-                        for (int i = 0; i < 2; i++)
-                        {
-                            ConsoleColor color = i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray;
-                            foreach (string outputPathKey in OutputPaths.Keys)
-                            {
-                                List<OutputPathItem> outputPathItems = OutputPaths[outputPathKey];
-
-                                lineCount++;
-                                ConsoleHelpers.Log(outputPathKey, true, color);
-                                for (int j = 0; j < outputPathItems.Count; j++)
-                                {
-                                    lineCount++;
-                                    OutputPathItem pathItem = outputPathItems[j];
-                                    ConsoleHelpers.Log($"|-> Output Path {j + 1}: {pathItem.Path}", true, color);
-                                    if (pathItem.HasExtentions)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> Extensions: " + string.Join(", ", pathItem.Extensions), true, color);
-                                    }
-                                    if (pathItem.HasComments)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> Comments: " + string.Join(", ", pathItem.Comments2), true, color);
-                                    }
-                                    if (pathItem.HasBeforeDates)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> Before Dates: " + string.Join(", ", pathItem.BeforeDates), true, color);
-                                    }
-                                    if (pathItem.HasAfterDates)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> After Dates: " + string.Join(", ", pathItem.AfterDates), true, color);
-                                    }
-                                    if (pathItem.HasDays)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> Days: " + string.Join(", ", pathItem.Days), true, color);
-                                    }
-                                    if (pathItem.HasMonths)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> Months: " + string.Join(", ", pathItem.Months), true, color);
-                                    }
-                                    if (pathItem.HasYears)
-                                    {
-                                        lineCount++;
-                                        ConsoleHelpers.Log(" |-> Years: " + string.Join(", ", pathItem.Years), true, color);
-                                    }
-                                }
-                            }
-
-                            if (i == 0)
-                            {
-                                ConsoleHelpers.Log("Press enter to return to menu...", false);
-                                Console.ReadKey();
-                                ConsoleHelpers.ClearLines(lineCount + 1);
-                            }
-                        }
 
                     }
                     else if ((choice == "5" && (!IgnoreUncategorized && choseOutputForAll)) || (choice == "5" && IgnoreUncategorized))
@@ -367,19 +307,72 @@ namespace AstroIngesterCore
             OutputPaths[key].Add(pathItem);
         }
 
-        //public bool AddOutputPath(string path)
-        //{
-        //    if (Directory.Exists(path))
-        //    {
-        //        OutputPaths.Add(new OutputPathItem(path));
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        ConsoleHelpers.Error("Invalid output path");
-        //        return false;
-        //    }
-        //}
+        public void PrintOutputPaths(bool reprint, out int lineCount)
+        {
+            lineCount = 0;
+
+            for (int i = 0; i < 2; i++)
+            {
+                ConsoleColor color = i == 0 ? ConsoleColor.White : ConsoleColor.DarkGray;
+                foreach (string outputPathKey in OutputPaths.Keys)
+                {
+                    List<OutputPathItem> outputPathItems = OutputPaths[outputPathKey];
+
+                    lineCount++;
+                    ConsoleHelpers.Log(outputPathKey, true, color);
+                    for (int j = 0; j < outputPathItems.Count; j++)
+                    {
+                        lineCount++;
+                        OutputPathItem pathItem = outputPathItems[j];
+                        ConsoleHelpers.Log($"|-> Output Path {j + 1}: {pathItem.Path}", true, color);
+                        if (pathItem.HasExtentions)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> Extensions: " + string.Join(", ", pathItem.Extensions), true, color);
+                        }
+                        if (pathItem.HasComments)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> Comments: " + string.Join(", ", pathItem.Comments2), true, color);
+                        }
+                        if (pathItem.HasBeforeDates)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> Before Dates: " + string.Join(", ", pathItem.BeforeDates), true, color);
+                        }
+                        if (pathItem.HasAfterDates)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> After Dates: " + string.Join(", ", pathItem.AfterDates), true, color);
+                        }
+                        if (pathItem.HasDays)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> Days: " + string.Join(", ", pathItem.Days), true, color);
+                        }
+                        if (pathItem.HasMonths)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> Months: " + string.Join(", ", pathItem.Months), true, color);
+                        }
+                        if (pathItem.HasYears)
+                        {
+                            lineCount++;
+                            ConsoleHelpers.Log(" |-> Years: " + string.Join(", ", pathItem.Years), true, color);
+                        }
+                    }
+                }
+
+                if (i == 0 && reprint)
+                {
+                    ConsoleHelpers.Log("Press enter to return to menu...", false);
+                    Console.ReadKey();
+                    ConsoleHelpers.ClearLines(lineCount + 1);
+                }
+
+                if (!reprint) i += 2;
+            }
+        } 
 
         public async Task StartMoving()
         {
@@ -476,6 +469,116 @@ namespace AstroIngesterCore
                         });
                         ConsoleHelpers.ClearLines(1);
                         ConsoleHelpers.Success($"Successfully processed {count}/{totalCount} files");
+                        ConsoleHelpers.Muted(" ");
+                    });
+                }
+            }
+        }
+
+        public async Task MoveFiles()
+        {
+            string[] directories = Directory.GetDirectories(InputPath, "*", SearchOption.AllDirectories);
+            foreach (string directory in directories)
+            {
+                Dictionary<string, List<MoveOperationItem>> categorizedOperations = new()
+                {
+                    { "sort", [] },
+                    { "copy", [] },
+                    { "other", [] }
+                };
+                ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
+
+                if (Verbose) ConsoleHelpers.Muted($"Processing directory: {directory}");
+
+                string[] filePaths = Directory.GetFiles(directory);
+                foreach (string filePath in filePaths)
+                {
+                    if (Verbose) ConsoleHelpers.Muted($"|--> Indexing file: {filePath}");
+
+                    FileInfo fileInfo = new FileInfo(filePath);
+                    DateTime fileTakenDate = MetadataTools.GetDate(filePath);
+                    int year = fileTakenDate.Year;
+                    int month = fileTakenDate.Month;
+                    int day = fileTakenDate.Day;
+                    string type = fileInfo.Extension.ToLower();
+                    string? comment = MetadataTools.GetComment(filePath);
+
+                    if (OutputPaths.TryGetValue("sort", out List<OutputPathItem>? sortOutList))
+                    {
+                        foreach (OutputPathItem outputItem in sortOutList)
+                        {
+                            if (outputItem.VerifyFileAgainstOptions(fileInfo))
+                            {
+                                string outputPath = Path.Combine(outputItem.Path, year.ToString(), month.ToString(), day.ToString());
+                                MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
+                                categorizedOperations["sort"].Add(moveItem);
+                            }
+                        }
+                    }
+
+                    if (OutputPaths.TryGetValue("copy", out List<OutputPathItem>? copyOutList))
+                    {
+                        foreach (OutputPathItem outputItem in copyOutList)
+                        {
+                            if (outputItem.VerifyFileAgainstOptions(fileInfo))
+                            {
+                                string outputPath = Path.Combine(outputItem.Path);
+                                MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
+                                categorizedOperations["copy"].Add(moveItem);
+                            }
+                        }
+                    }
+
+                    if (OutputPaths.TryGetValue("other", out List<OutputPathItem>? otherOutList))
+                    {
+                        foreach (OutputPathItem outputItem in otherOutList)
+                        {
+                            if (outputItem.VerifyFileAgainstOptions(fileInfo))
+                            {
+                                string outputPath = Path.Combine(outputItem.Path, year.ToString(), month.ToString(), day.ToString());
+                                MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
+                                categorizedOperations["other"].Add(moveItem);
+                            }
+                        }
+                    }
+                }
+
+                foreach (string typeKey in categorizedOperations.Keys)
+                {
+                    await Task.Run(() =>
+                    {
+                        int count = 0;
+                        int errorCount = 0;
+                        int totalCount = categorizedOperations[typeKey].Count;
+                        Parallel.ForEach(categorizedOperations[typeKey], parallelOptions, operation =>
+                        {
+                            try
+                            {
+                                if (!Directory.Exists(operation.DestinationPath))
+                                    Directory.CreateDirectory(operation.DestinationPath);
+
+                                string destPath = Path.Combine(operation.DestinationPath, operation.Name);
+
+                                if (File.Exists(operation.SourcePath))
+                                    File.Copy(operation.SourcePath, destPath, false);
+
+                                count++;
+                                float progressDecimal = (float)count / totalCount;
+                                string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
+                                ConsoleHelpers.SyncWrite(1, $"Processing {typeKey} list {progressBar} ({count}/{totalCount}) [error({errorCount} )] ({operation.Name})", true, ConsoleColor.DarkGray);
+                            }
+                            catch (Exception error)
+                            {
+                                count++;
+                                errorCount++;
+                                float progressDecimal = (float)count / totalCount;
+                                string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
+                                ConsoleHelpers.SyncWrite(1, $"Processing {typeKey} list {progressBar} ({count}/{totalCount}) error([{errorCount}] ({operation.Name}))", true, ConsoleColor.DarkGray);
+                                //ConsoleHelpers.SyncWrite($"Error processing file {operation.SourcePath}: {error.Message}", true, ConsoleColor.Red);
+                            }
+                        });
+                        ConsoleHelpers.ClearLines(1);
+                        ConsoleHelpers.Success($"Successfully processed {count}/{totalCount} [error({errorCount})] files");
                         ConsoleHelpers.Muted(" ");
                     });
                 }

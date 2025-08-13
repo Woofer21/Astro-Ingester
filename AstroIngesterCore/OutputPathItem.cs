@@ -149,5 +149,37 @@ namespace AstroIngesterCore
             }
             _years.AddRange(years);
         }
+
+        public bool VerifyFileAgainstOptions(FileInfo file)
+        {
+            string comment = MetadataTools.GetComment(file.FullName);
+            DateTime date = MetadataTools.GetDate(file.FullName);
+
+            if (file == null || !file.Exists)
+                return false;
+
+            if (HasExtentions && !_extensions.Contains(file.Extension.ToLower()))
+                return false;
+
+            if (HasComments && !_comments.Contains(comment))
+                return false;
+
+            if (HasBeforeDates && _beforeDates.Any(date => file.CreationTime > date))
+                return false;
+
+            if (HasBeforeDates && _beforeDates.Any(date => file.CreationTime < date))
+                return false;
+
+            if (HasDays && !_days.Contains(date.Day))
+                return false;
+
+            if (HasMonths && !_months.Contains(date.Month))
+                return false;
+
+            if (HasYears && !_years.Contains(date.Year))
+                return false;
+
+            return true;
+        }
     }
 }

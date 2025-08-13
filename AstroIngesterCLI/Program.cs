@@ -13,6 +13,7 @@ namespace AstroIngesterCLI
 		{
 
 			FileTools fileTools = new();
+            bool LoadedFromConfig = false;
 
             if (args.Length > 0)
             {
@@ -52,12 +53,15 @@ namespace AstroIngesterCLI
 
                             ConfigManager cfmg = new(fileTools);
                             cfmg.LoadConfig(configFile);
+                            LoadedFromConfig = true;
                             break;
                     }
                 }
             }
 
-            fileTools.AutoDetectDrive();
+            if (!LoadedFromConfig)
+                fileTools.AutoDetectDrive();
+
 			string dirPath = fileTools.InputPath;
 			Dictionary<string, List<OutputPathItem>> outputPaths = fileTools.OutputPaths;
 
@@ -69,71 +73,122 @@ namespace AstroIngesterCLI
 				dirPath = fileTools.InputPath;
 			}
 
-			//Determine output modes, this decides if we need multiple output paths or just one
-			string splitQuestion = "Would you like to split up files by their type? (Y/n): ";
-            ConsoleHelpers.Log(splitQuestion, false);
-			string splitInput = Console.ReadLine();
-			if (splitInput != null)
-			{
-				if (splitInput.Equals("n", StringComparison.OrdinalIgnoreCase) || splitInput.Equals("no", StringComparison.OrdinalIgnoreCase))
-				{
-                    fileTools.SeperateByType = false;
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted($"{splitQuestion}error(No)");
-                }
-                else
-				{
-                    fileTools.SeperateByType = true;
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted($"{splitQuestion}success(Yes)");
-                }
-            }
-
-            if (fileTools.SeperateByType)
-            {
-                string ignoreQuestion = "Would you like to move files not split by type? (y/N): ";
-                ConsoleHelpers.Log(ignoreQuestion, false);
-                string ignoreInput = Console.ReadLine();
-                if (ignoreInput != null)
+            if (!LoadedFromConfig)
+            {//Determine output modes, this decides if we need multiple output paths or just one
+                string splitQuestion = "Would you like to split up files by their type? (Y/n): ";
+                ConsoleHelpers.Log(splitQuestion, false);
+                string splitInput = Console.ReadLine();
+                if (splitInput != null)
                 {
-                    if (ignoreInput.Equals("y", StringComparison.OrdinalIgnoreCase) || ignoreInput.Equals("yes", StringComparison.OrdinalIgnoreCase))
+                    if (splitInput.Equals("n", StringComparison.OrdinalIgnoreCase) || splitInput.Equals("no", StringComparison.OrdinalIgnoreCase))
                     {
-                        fileTools.IgnoreUncategorized = false;
+                        fileTools.SeperateByType = false;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
-                        ConsoleHelpers.Muted($"{ignoreQuestion}success(Yes)");
+                        ConsoleHelpers.Muted($"{splitQuestion}error(No)");
                     }
                     else
                     {
-                        fileTools.IgnoreUncategorized = true;
+                        fileTools.SeperateByType = true;
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
-                        ConsoleHelpers.Muted($"{ignoreQuestion}error(No)");
+                        ConsoleHelpers.Muted($"{splitQuestion}success(Yes)");
+                    }
+                }
+
+                if (fileTools.SeperateByType)
+                {
+                    string ignoreQuestion = "Would you like to move files not split by type? (y/N): ";
+                    ConsoleHelpers.Log(ignoreQuestion, false);
+                    string ignoreInput = Console.ReadLine();
+                    if (ignoreInput != null)
+                    {
+                        if (ignoreInput.Equals("y", StringComparison.OrdinalIgnoreCase) || ignoreInput.Equals("yes", StringComparison.OrdinalIgnoreCase))
+                        {
+                            fileTools.IgnoreUncategorized = false;
+                            Console.SetCursorPosition(0, Console.CursorTop - 1);
+                            ConsoleHelpers.Muted($"{ignoreQuestion}success(Yes)");
+                        }
+                        else
+                        {
+                            fileTools.IgnoreUncategorized = true;
+                            Console.SetCursorPosition(0, Console.CursorTop - 1);
+                            ConsoleHelpers.Muted($"{ignoreQuestion}error(No)");
+                        }
+                    }
+                }
+
+                string commentQuestion = "Would you like to split & copy files by their comment content after ingestion? (Y/n): ";
+                ConsoleHelpers.Log(commentQuestion, false);
+                string commentInput = Console.ReadLine();
+                if (commentInput != null)
+                {
+                    if (commentInput.Equals("n", StringComparison.OrdinalIgnoreCase) || commentInput.Equals("no", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fileTools.SeperateByComment = false;
+                        Console.SetCursorPosition(0, Console.CursorTop - 1);
+                        ConsoleHelpers.Muted($"{commentQuestion}error(No)");
+                    }
+                    else
+                    {
+                        fileTools.SeperateByComment = true;
+                        Console.SetCursorPosition(0, Console.CursorTop - 1);
+                        ConsoleHelpers.Muted($"{commentQuestion}success(Yes)");
+                    }
+                }
+
+                fileTools.AddOutputPath();
+            }
+            else
+            {
+                bool inMenu = true;
+                int menuLines = 5;
+
+                while (inMenu)
+                {
+                    ConsoleHelpers.Log("Loaded config from file. Please select one of the following options: ");
+                    ConsoleHelpers.Log("1) Review current config");
+                    ConsoleHelpers.Log("2) Continue with current config");
+                    ConsoleHelpers.Log("-1) Exit the program");
+                    ConsoleHelpers.Log("> ", false);
+
+                    string choice = Console.ReadLine();
+                    ConsoleHelpers.ClearLines(menuLines);
+                    switch (choice)
+                    {
+                        case "1":
+                            ConsoleHelpers.Log("1) Review current config");
+                            ConsoleHelpers.Log($"Input Path: {fileTools.InputPath}");
+                            ConsoleHelpers.Log($"Verbose Mode: {(fileTools.Verbose ? "Enabled" : "Disabled")}");
+
+                            fileTools.PrintOutputPaths(false, out int lineCount);
+
+                            ConsoleHelpers.Log("Press any key to continue...", false);
+                            string _ = Console.ReadLine();
+                            ConsoleHelpers.ClearLines(lineCount + 4);
+                            break;
+                        case "2":
+                            inMenu = false;
+                            break;
+                        case "-1":
+                            Environment.Exit(0);
+                            break;
+                        default:
+                            continue;
                     }
                 }
             }
 
-            string commentQuestion = "Would you like to split & copy files by their comment content after ingestion? (Y/n): ";
-            ConsoleHelpers.Log(commentQuestion, false);
-            string commentInput = Console.ReadLine();
-            if (commentInput != null)
+            if (LoadedFromConfig)
             {
-                if (commentInput.Equals("n", StringComparison.OrdinalIgnoreCase) || commentInput.Equals("no", StringComparison.OrdinalIgnoreCase))
-                {
-                    fileTools.SeperateByComment = false;
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted($"{commentQuestion}error(No)");
-                }
-                else
-                {
-                    fileTools.SeperateByComment = true;
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    ConsoleHelpers.Muted($"{commentQuestion}success(Yes)");
-                }
+
+                fileTools.MoveFiles();
+            }
+            else
+            {
+                ConsoleHelpers.Log("Old move func");
+                fileTools.StartMoving();
             }
 
-            fileTools.AddOutputPath();
-            fileTools.StartMoving();
-
-			ConsoleHelpers.Log("Ended");
+            ConsoleHelpers.Log("Ended");
             Console.ReadLine();
         }
     }
