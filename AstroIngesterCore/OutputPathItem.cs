@@ -167,7 +167,7 @@ namespace AstroIngesterCore
             if (HasBeforeDates && _beforeDates.Any(date => file.CreationTime > date))
                 return false;
 
-            if (HasBeforeDates && _beforeDates.Any(date => file.CreationTime < date))
+            if (HasAfterDates && _afterDates.Any(date => file.CreationTime < date))
                 return false;
 
             if (HasDays && !_days.Contains(date.Day))
