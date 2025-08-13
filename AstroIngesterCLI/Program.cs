@@ -178,17 +178,10 @@ namespace AstroIngesterCLI
             }
 
             if (LoadedFromConfig)
-            {
-
                 fileTools.MoveFiles();
-            }
             else
-            {
-                ConsoleHelpers.Log("Old move func");
                 fileTools.StartMoving();
-            }
 
-            ConsoleHelpers.Log("Ended");
             Console.ReadLine();
         }
     }

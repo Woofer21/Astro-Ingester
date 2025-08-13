@@ -488,12 +488,15 @@ namespace AstroIngesterCore
                 };
                 ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
-                if (Verbose) ConsoleHelpers.Muted($"Processing directory: {directory}");
+                ConsoleHelpers.Muted($"Processing directory: {directory}");
 
                 string[] filePaths = Directory.GetFiles(directory);
-                foreach (string filePath in filePaths)
+                int count = 0;
+                int totalCount = filePaths.Length;
+                for (int i = 0; i < totalCount; i++)
                 {
-                    if (Verbose) ConsoleHelpers.Muted($"|--> Indexing file: {filePath}");
+                    string filePath = filePaths[i];
+                    //if (Verbose) ConsoleHelpers.Muted($"|--> Indexing file: {filePath}");
 
                     FileInfo fileInfo = new FileInfo(filePath);
                     DateTime fileTakenDate = MetadataTools.GetDate(filePath);
@@ -541,7 +544,18 @@ namespace AstroIngesterCore
                             }
                         }
                     }
+
+                    if (count == 0)
+                        ConsoleHelpers.Muted(" ");
+
+                    count++;
+                    float progressDecimal = (float)count / totalCount;
+                    string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
+                    ConsoleHelpers.SyncWrite(1, $"Indexing file {fileInfo.Name} {progressBar} ({count}/{totalCount})", true, ConsoleColor.DarkGray);
                 }
+
+                ConsoleHelpers.ClearLines(2);
+                ConsoleHelpers.Success($"Successfully indexed {totalCount}/{totalCount} files from {directory}");
 
                 foreach (string typeKey in categorizedOperations.Keys)
                 {
@@ -562,6 +576,9 @@ namespace AstroIngesterCore
                                 if (File.Exists(operation.SourcePath))
                                     File.Copy(operation.SourcePath, destPath, false);
 
+                                if (count == 0)
+                                    ConsoleHelpers.Muted(" ");
+
                                 count++;
                                 float progressDecimal = (float)count / totalCount;
                                 string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
@@ -569,6 +586,9 @@ namespace AstroIngesterCore
                             }
                             catch (Exception error)
                             {
+                                if (count == 0)
+                                    ConsoleHelpers.Muted(" ");
+
                                 count++;
                                 errorCount++;
                                 float progressDecimal = (float)count / totalCount;
@@ -578,11 +598,12 @@ namespace AstroIngesterCore
                             }
                         });
                         ConsoleHelpers.ClearLines(1);
-                        ConsoleHelpers.Success($"Successfully processed {count}/{totalCount} [error({errorCount})] files");
-                        ConsoleHelpers.Muted(" ");
+                        ConsoleHelpers.Success($"Successfully processed {totalCount}/{totalCount} [error({errorCount} )] files");
                     });
                 }
             }
+
+            ConsoleHelpers.Log("All operations completed, press enter to exit...", false);
         }
     }
 }
