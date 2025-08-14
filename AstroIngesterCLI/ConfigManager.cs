@@ -119,6 +119,7 @@ namespace AstroIngesterCLI
 
             int pathLength = value.Split(',')[0].Length;
             string sortPath = value.Split(',')[0].Trim('"').Trim();
+            string modifedSortPath = sortPath;
             string allOptions = value.Substring(pathLength).Trim(',').Trim();
 
             MatchCollection matches = Regex.Matches(allOptions, @"\w+\[[^\]]+\]");
@@ -129,7 +130,20 @@ namespace AstroIngesterCLI
                 return false;
             }
 
-            if (!Directory.Exists(sortPath))
+            if (modifedSortPath.IndexOf("<year>") > -1)
+            {
+                modifedSortPath = modifedSortPath.Substring(0, modifedSortPath.IndexOf("<year>"));
+            }
+            if (modifedSortPath.IndexOf("<month>") > -1)
+            {
+                modifedSortPath = modifedSortPath.Substring(0, modifedSortPath.IndexOf("<month>"));
+            }
+            if (modifedSortPath.IndexOf("<day>") > -1)
+            {
+                modifedSortPath = modifedSortPath.Substring(0, modifedSortPath.IndexOf("<day>"));
+            }
+
+            if (!Directory.Exists(modifedSortPath))
             {
                 Error($"First argument of {key} at line {lineNumber} must be a valid directory path");
                 return false;
