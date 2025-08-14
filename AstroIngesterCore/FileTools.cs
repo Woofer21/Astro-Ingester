@@ -515,7 +515,6 @@ namespace AstroIngesterCore
                                 string outputPath = outputItem.Path.Replace("<year>", year.ToString())
                                                .Replace("<month>", month.ToString())
                                                .Replace("<day>", day.ToString());
-                                //string outputPath = Path.Combine(outputItem.Path, year.ToString(), month.ToString(), day.ToString());
                                 MoveOperationItem moveItem = new MoveOperationItem(fileInfo.FullName, outputPath, fileInfo.Name, year, month, day, type, comment);
                                 categorizedOperations["sort"].Add(moveItem);
                             }
@@ -528,7 +527,6 @@ namespace AstroIngesterCore
                         {
                             if (outputItem.VerifyFileAgainstOptions(fileInfo))
                             {
-                                //string outputPath = Path.Combine(outputItem.Path);
                                 string outputPath = outputItem.Path.Replace("<year>", year.ToString())
                                                .Replace("<month>", month.ToString())
                                                .Replace("<day>", day.ToString());
@@ -544,7 +542,6 @@ namespace AstroIngesterCore
                         {
                             if (outputItem.VerifyFileAgainstOptions(fileInfo))
                             {
-                                //string outputPath = Path.Combine(outputItem.Path, year.ToString(), month.ToString(), day.ToString());
                                 string outputPath = outputItem.Path.Replace("<year>", year.ToString())
                                                .Replace("<month>", month.ToString())
                                                .Replace("<day>", day.ToString());
