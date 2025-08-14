@@ -1,14 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Version>0.1.0</Version>
+    <InformationalVersion>0.1.0 Alpha</InformationalVersion>
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>AstroIngesterCLI</AssemblyTitle>
     <Product>AstroIngesterCLI</Product>
     <Copyright>Copyright ©  2025</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <RepositoryUrl>https://github.com/Woofer21/Astro-Ingester</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AstroIngesterCore\AstroIngesterCore.csproj" />
   </ItemGroup>
