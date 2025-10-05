@@ -55,6 +55,15 @@ namespace AstroIngesterCLI
                             Info($"Loaded {key}: {value}");
 
                         break;
+                    case "ignoredinputpath":
+                    case "ignored_input_path":
+                        bool ignoreSucc = HandleIgnoredInputs(key, value);
+                        didntFail &= ignoreSucc;
+
+                        if (ignoreSucc)
+                            Info($"Loaded {key}: {value}");
+
+                        break;
                     case "outputsort":
                     case "output_sort":
                         bool outSortSucc = HandleOutputPath(key, value, i + 1, "sort");
@@ -106,6 +115,41 @@ namespace AstroIngesterCLI
             _fileTools.ManuallySelectDrive(value);
             _inputPathSet = true;
 			return true;
+        }
+
+        private bool HandleIgnoredInputs(string key, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Error($"{key} must be passed a value and can not be empty");
+                return false;
+            }
+
+            string modifiedSortPath = value;
+            int indx = modifiedSortPath.IndexOf('*');
+
+            if (indx > -1)
+            {
+                if (modifiedSortPath[indx - 1] != '/')
+                    modifiedSortPath = modifiedSortPath.Substring(0, modifiedSortPath.LastIndexOf('/'));
+                 else 
+                    modifiedSortPath = modifiedSortPath.Substring(0, indx);
+            }
+
+            if (!Directory.Exists(modifiedSortPath))
+            {
+                Error($"{key} must be a valid directory");
+                return false;
+            }
+
+            bool addPathResult = _fileTools.AddIgnoredPath(value);
+            if (!addPathResult)
+            {
+                Error($"Failed to add {key} path '{value}' [{modifiedSortPath}]. It may already be added.");
+                return false;
+            }
+
+            return true;
         }
 
         private bool HandleOutputPath(string key, string value, int lineNumber, string type)

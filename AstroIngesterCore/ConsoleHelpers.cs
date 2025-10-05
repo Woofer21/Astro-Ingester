@@ -28,6 +28,7 @@ namespace AstroIngesterCore
             {"success", ConsoleColor.Green},
             {"muted", ConsoleColor.DarkGray},
             {"warning", ConsoleColor.Yellow},
+            {"debug", ConsoleColor.Magenta},
             {"error", ConsoleColor.Red},
         };
 
@@ -116,6 +117,12 @@ namespace AstroIngesterCore
         public static void Info(string message, bool newLine = true)
         {
             Parser(message, newLine, _colorMaps["info"]);
+            Console.ResetColor();
+        }
+
+        public static void Debug(string message, bool newLine = true)
+        {
+            Parser(message, newLine, _colorMaps["debug"]);
             Console.ResetColor();
         }
 

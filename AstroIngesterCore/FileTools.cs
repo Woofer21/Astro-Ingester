@@ -15,6 +15,7 @@ namespace AstroIngesterCore
         private DriveInfo[] drives = DriveInfo.GetDrives();
         private DriveInfo? selectedDrive;
         public Dictionary<string, List<OutputPathItem>> OutputPaths { get; } = [];
+        public List<string> IgnoredPaths { get; } = [];
         public bool SeperateByType { get; set; } = true;
         public bool SeperateByComment { get; set; } = true;
         public bool IgnoreUncategorized { get; set; } = true;
@@ -109,6 +110,41 @@ namespace AstroIngesterCore
 
             ConsoleHelpers.Muted("No Drives Detected");
             return false;
+        }
+
+        public bool AddIgnoredPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                ConsoleHelpers.Error("Path cannot be empty, please try again");
+                return false;
+            }
+
+            //Just checks that the path is valid up until the first wild card
+            string modifedPath = path;
+            int wildCardIndx = path.IndexOf('*');
+            if (path.IndexOf('*') > -1)
+            {
+                if (modifedPath[wildCardIndx - 1] != '/')
+                    modifedPath = path.Substring(0, path.LastIndexOf('/'));
+                else
+                    modifedPath = path.Substring(0, wildCardIndx);
+            }
+
+            if (!Directory.Exists(modifedPath))
+            {
+                ConsoleHelpers.Error($"Invalid path: {path}, please try again");
+                return false;
+            }
+
+            if (IgnoredPaths.Contains(path.ToLower()))
+            {
+                ConsoleHelpers.Error($"Path already ignored: {path}, please try again");
+                return false;
+            }
+
+            IgnoredPaths.Add(path.ToLower());
+            return true;
         }
 
         public void AddOutputPath()
@@ -456,7 +492,7 @@ namespace AstroIngesterCore
 
                                 if (File.Exists(operation.SourcePath))
                                     File.Copy(operation.SourcePath, destPath, false);
-                                
+
                                 count++;
                                 float progressDecimal = (float)count / totalCount;
                                 string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
@@ -489,6 +525,15 @@ namespace AstroIngesterCore
                 ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
                 ConsoleHelpers.Muted($"Processing directory: {directory}");
+
+                if (IsPathIngored(directory))
+                {
+                    if (Verbose)
+                    {
+                        ConsoleHelpers.Muted($"|--> Ignored path, skipping...");
+                        continue;
+                    }
+                }
 
                 string[] filePaths = Directory.GetFiles(directory);
                 int count = 0;
@@ -606,6 +651,71 @@ namespace AstroIngesterCore
             }
 
             ConsoleHelpers.Log("All operations completed, press enter to exit...", false);
+        }
+    
+        private bool IsPathIngored(string path)
+        {
+            foreach (string ignoredPath in IgnoredPaths)
+            {
+                char[] splitOptions = new char[] { '/', '\\' };
+                string[] splitPath = path.Split(splitOptions, StringSplitOptions.RemoveEmptyEntries); 
+                string[] splitIgnoredPath = ignoredPath.Split(splitOptions, StringSplitOptions.RemoveEmptyEntries);
+
+                string rejoinedPath = string.Join('/', splitPath).ToLower();
+                string rejoinedIgnoredPath = string.Join('/', splitIgnoredPath).ToLower();
+
+                if (string.Equals(rejoinedPath, rejoinedIgnoredPath))
+                    return true;
+
+                bool isPathIngnored = true;
+                // Goes through each part of the ignored path
+                if (splitIgnoredPath.Length <= splitPath.Length)
+                {
+                    for (int i = 0; i < splitIgnoredPath.Length; i++)
+                    {
+                        string pathPart = splitPath[i].ToLower();
+                        string ignoredPart = splitIgnoredPath[i].ToLower();
+
+                        // If it is a wildcard, skip to the next section
+                        if (ignoredPart.Equals("*"))
+                            continue;
+
+                        // Checks if that section of path contains a wild card + text
+                        if (ignoredPart.Contains('*'))
+                        {
+                            string updatedPathPart = pathPart;
+                            string[] wildCardParts = ignoredPart.Split('*', StringSplitOptions.RemoveEmptyEntries);
+
+                            // Checks path for each text portion of the part containing the wild card
+                            foreach (string wildCardPart in wildCardParts)
+                            {
+                                int indxCurent = pathPart.IndexOf(wildCardPart);
+
+                                if (indxCurent == -1)
+                                    isPathIngnored = false;
+
+                                updatedPathPart = pathPart.Substring(indxCurent + wildCardPart.Length);
+                            }
+
+                            // If all of the parts were found in the correct order then skip to next section
+                            continue;
+                        }
+
+                        // If the parts do not match then this path is not ignored
+                        if (!pathPart.Equals(ignoredPart))
+                            isPathIngnored = false;
+                    }
+                }
+                // If the ignored path is longer than the actual path then it cant be ignored
+                else
+                    isPathIngnored = false;
+
+                // If the path is ignored then we can exit early
+                if (isPathIngnored) 
+                    return true;
+            }
+
+            return false;
         }
     }
 }

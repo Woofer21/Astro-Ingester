@@ -5,7 +5,7 @@ This is the mono repo for my AstroIngester applications. The repo contains 3 pro
 3. AstroIngester Core - This is the core library, it contains the shared logic for the CLI and UI applications
 
 ## AstroIngester CLI
-### Current Version ~ 0.1.0 Alpha
+### Current Version ~ 0.1.1 Alpha
 
 This is the CLI application. It can be used to move files from one directory to other directories.
 
@@ -63,7 +63,25 @@ The config file accepts the following arguments:
     ```txt
     InputPath=G:/DCIM
     ```
-3. `OutputSort`
+4. `IgnoredInputPath`
+    - Alt: `Ignored_Input_Path`
+    - Description: These are paths to the directories which you do not want to move files from, supports `*` as a wild card. Ignored paths are recursive, meaning it will ignore all paths within the highest ignored path.
+    - Usage:
+    ```txt
+    IgnoredInputPath=<path>
+    ```
+    - Example:
+    ```txt
+    IgnoredInputPath=D:/Photography/Plant Pictutes/
+    # ^ This will ignore the plant pictures folder, and all folders within that folder
+    
+    IgnoredInputPath=D:/Photography/*Images/*/*
+    # ^ This will ignore any folder that is 2 or more folders deep within any folder that ends with "Images",
+    # eg: D:/Photography/Raw Images/June/Day 1/ will be ignored
+    # eg: D:/Photography/Images/June/Day 1/ will be ignored
+    # eg: D:/Photography/Images/June/ will NOT be ignored
+    ```
+5. `OutputSort`
     - Alt: `Output_Sort`
     - Description: The path to the directory where you want to move the files to, supports `<year>`, `<month>`, and `<day>` placeholders
     - Usage:
@@ -74,7 +92,7 @@ The config file accepts the following arguments:
     ```txt
     OutputSort=D:/Photography/<year>/<month>, Extension[.jpg], AfterDate[9/21/2025]
     ```
-4. `OutputCopy`
+6. `OutputCopy`
     - Alt: `Output_Copy`
     - Description: Additional paths that you would like to copy files to, supports `<year>`, `<month>`, and `<day>` placeholders
     - Usage:
