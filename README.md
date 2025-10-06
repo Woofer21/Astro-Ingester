@@ -93,8 +93,8 @@ The config file accepts the following arguments:
     OutputMove=D:/Photography/<year>/<month>, Extension[.jpg], AfterDate[9/21/2025]
     ```
     
-    > [!WARNING]
-    > Creating multiple `OutputMove` paths with overlapping filters will <ins>fail</ins> as the program will try to move the file from a location that no longer exists.
+> [!WARNING]
+> Creating multiple `OutputMove` paths with overlapping filters will <ins>fail</ins> as the program will try to move the file from a location that no longer exists.
 6. `OutputCopy`
     - Alt: `Output_Copy`
     - Description: Additional paths that you would like to copy files to, supports `<year>`, `<month>`, and `<day>` placeholders
