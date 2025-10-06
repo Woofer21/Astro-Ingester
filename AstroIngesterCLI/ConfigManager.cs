@@ -64,8 +64,8 @@ namespace AstroIngesterCLI
                             Info($"Loaded {key}: {value}");
 
                         break;
-                    case "outputsort":
-                    case "output_sort":
+                    case "outputmove":
+                    case "output_move":
                         bool outSortSucc = HandleOutputPath(key, value, i + 1, "sort");
                         didntFail &= outSortSucc;
 

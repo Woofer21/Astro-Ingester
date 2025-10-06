@@ -27,6 +27,12 @@ namespace AstroIngesterCore
             get { return inputPath; }
         }
 
+        private enum OperationType
+        {
+            Copy,
+            Move
+        }
+
         public DriveInfo[] GetDrives()
         {
             return drives;
@@ -608,49 +614,69 @@ namespace AstroIngesterCore
                 ConsoleHelpers.ClearLines(2);
                 ConsoleHelpers.Success($"Successfully indexed {totalCount}/{totalCount} files from {directory}");
 
-                foreach (string typeKey in categorizedOperations.Keys)
-                {
-                    ConsoleHelpers.Muted(" ");
+                if (categorizedOperations["copy"].Count > 0)
+                    await HandleFileTask(categorizedOperations["copy"], parallelOptions, OperationType.Copy);
 
-                    await Task.Run(() =>
-                    {
-                        int count = 0;
-                        int errorCount = 0;
-                        int totalCount = categorizedOperations[typeKey].Count;
-                        Parallel.ForEach(categorizedOperations[typeKey], parallelOptions, operation =>
-                        {
-                            try
-                            {
-                                if (!Directory.Exists(operation.DestinationPath))
-                                    Directory.CreateDirectory(operation.DestinationPath);
+                if (categorizedOperations["other"].Count > 0)
+                    await HandleFileTask(categorizedOperations["other"], parallelOptions, OperationType.Copy);
 
-                                string destPath = Path.Combine(operation.DestinationPath, operation.Name);
+                if (categorizedOperations["sort"].Count > 0)
+                    await HandleFileTask(categorizedOperations["sort"], parallelOptions, OperationType.Move);
 
-                                if (File.Exists(operation.SourcePath))
-                                    File.Copy(operation.SourcePath, destPath, false);
-
-                                count++;
-                                float progressDecimal = (float)count / totalCount;
-                                string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
-                                ConsoleHelpers.SyncWrite(1, $"Processing {typeKey} list {progressBar} ({count}/{totalCount}) [error({errorCount} )] ({operation.Name})", true, ConsoleColor.DarkGray);
-                            }
-                            catch (Exception error)
-                            {
-                                count++;
-                                errorCount++;
-                                float progressDecimal = (float)count / totalCount;
-                                string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
-                                ConsoleHelpers.SyncWrite(1, $"Processing {typeKey} list {progressBar} ({count}/{totalCount}) error([{errorCount}] ({operation.Name}))", true, ConsoleColor.DarkGray);
-                                //ConsoleHelpers.SyncWrite($"Error processing file {operation.SourcePath}: {error.Message}", true, ConsoleColor.Red);
-                            }
-                        });
-                        ConsoleHelpers.ClearLines(1);
-                        ConsoleHelpers.Success($"Successfully processed {totalCount}/{totalCount} [error({errorCount} )] files");
-                    });
-                }
             }
 
             ConsoleHelpers.Log("All operations completed, press enter to exit...", false);
+        }
+
+        private async Task<bool> HandleFileTask(List<MoveOperationItem> operations, ParallelOptions parallelOptions, OperationType operationType)
+        {
+            ConsoleHelpers.Muted(" ");
+
+            await Task.Run(() =>
+            {
+                int count = 0;
+                int errorCount = 0;
+                int totalCount = operations.Count;
+                Parallel.ForEach(operations, parallelOptions, operation =>
+                {
+                    try
+                    {
+                        if (!Directory.Exists(operation.DestinationPath))
+                            Directory.CreateDirectory(operation.DestinationPath);
+
+                        string destPath = Path.Combine(operation.DestinationPath, operation.Name);
+
+                        if (File.Exists(operation.SourcePath))
+                            switch(operationType)
+                            {
+                                case OperationType.Move:
+                                    File.Move(operation.SourcePath, destPath, false);
+                                    break;
+                                case OperationType.Copy:
+                                    File.Copy(operation.SourcePath, destPath, false);
+                                    break;
+                            }
+
+                        count++;
+                        float progressDecimal = (float)count / totalCount;
+                        string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
+                        ConsoleHelpers.SyncWrite(1, $"Processing {(operationType == OperationType.Move ? "move" : "copy")} list {progressBar} ({count}/{totalCount}) [error({errorCount} )] ({operation.Name})", true, ConsoleColor.DarkGray);
+                    }
+                    catch (Exception error)
+                    {
+                        count++;
+                        errorCount++;
+                        float progressDecimal = (float)count / totalCount;
+                        string progressBar = new string('█', (int)(progressDecimal * 20)).PadRight(20, '░');
+                        ConsoleHelpers.SyncWrite(1, $"Processing {(operationType == OperationType.Move ? "move" : "copy")} list {progressBar} ({count}/{totalCount}) error([{errorCount}] ({operation.Name}))", true, ConsoleColor.DarkGray);
+                        //ConsoleHelpers.SyncWrite($"Error processing file {operation.SourcePath}: {error.Message}", true, ConsoleColor.Red);
+                    }
+                });
+                ConsoleHelpers.ClearLines(1);
+                ConsoleHelpers.Success($"Successfully processed {totalCount}/{totalCount} [error({errorCount} )] files from the {(operationType == OperationType.Move ? "move" : "copy")} list");
+            });
+
+            return true;
         }
     
         private bool IsPathIngored(string path)
