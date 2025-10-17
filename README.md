@@ -81,17 +81,20 @@ The config file accepts the following arguments:
     # eg: D:/Photography/Images/June/Day 1/ will be ignored
     # eg: D:/Photography/Images/June/ will NOT be ignored
     ```
-5. `OutputSort`
-    - Alt: `Output_Sort`
-    - Description: The path to the directory where you want to move the files to, supports `<year>`, `<month>`, and `<day>` placeholders
+5. `OutputMove`
+    - Alt: `Output_Move`
+    - Description: The path to the directory where you want to move the files to, supports `<year>`, `<month>`, and `<day>` placeholders.
     - Usage:
     ```txt
-    OutputSort=<path>, [Extension[]], [Comment[]], [BeforeDate[]], [AfterDate[]], [Day[]], [Month[]], [Year[]]
+    OutputMove=<path>, [Extension[]], [Comment[]], [BeforeDate[]], [AfterDate[]], [Day[]], [Month[]], [Year[]]
     ```
     - Example:
     ```txt
-    OutputSort=D:/Photography/<year>/<month>, Extension[.jpg], AfterDate[9/21/2025]
+    OutputMove=D:/Photography/<year>/<month>, Extension[.jpg], AfterDate[9/21/2025]
     ```
+    
+> [!WARNING]
+> Creating multiple `OutputMove` paths with overlapping filters will <ins>fail</ins> as the program will try to move the file from a location that no longer exists.
 6. `OutputCopy`
     - Alt: `Output_Copy`
     - Description: Additional paths that you would like to copy files to, supports `<year>`, `<month>`, and `<day>` placeholders
@@ -219,12 +222,10 @@ Verbose=true
 InputPath=G:/DCIM
 
 # Output paths for images
-OutputSort=D:/Photography/Images/<year>/<month>, Extension[.jpg, .png]
-OutputSort=F:/Photography/Images/<year>/<month>, Extension[.jpg, .png]
+OutputMove=D:/Photography/Images/<year>/<month>, Extension[.jpg, .png]
 
 # Output paths for raws
-OutputSort=D:/Photography/Raw Images/<year>/<month>, Extension[.nef]
-OutputSort=F:/Photography/Raw Images/<year>/<month>, Extension[.nef]
+OutputMove=D:/Photography/Raw Images/<year>/<month>, Extension[.nef]
 
 # Output paths for files based on comments
 OutputCopy=D:/Photography/Pre-Processing/Day 1/lights, Comment[L], Extension[.nef], AfterDate[9/27/2025]
